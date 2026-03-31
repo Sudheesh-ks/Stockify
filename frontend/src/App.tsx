@@ -1,9 +1,12 @@
+import { Toaster } from "react-hot-toast"
+import UserRoutes from "./routes/routes"
 
 function App() {
 
   return (
     <>
-      <h1>Welcome to stockify</h1>
+      <Toaster position="top-center" />
+      <UserRoutes />
     </>
   )
 }
