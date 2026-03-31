@@ -1,10 +1,14 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Lock, LayoutGrid } from "lucide-react";
+import toast from "react-hot-toast";
+import { showErrorToast } from "../utils/errorHandler";
+import { resetPasswordAPI } from "../services/authServices";
 import InputField from "../components/LoginComponents/InputField";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     password: "",
@@ -20,6 +24,24 @@ const ResetPassword = () => {
     password: false,
     confirmPassword: false,
   });
+
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    // Get email from location state or localStorage
+    const stateEmail = location.state?.email;
+    const tempData = JSON.parse(localStorage.getItem("tempUserData") || "{}");
+
+    if (stateEmail) {
+      setEmail(stateEmail);
+    } else if (tempData.email) {
+      setEmail(tempData.email);
+    } else {
+      toast.error("Email not found. Please try again.");
+      navigate("/email-verification");
+    }
+  }, [location.state, navigate]);
 
   const validateField = (name: string, value: string) => {
     let error = "";
@@ -58,7 +80,7 @@ const ResetPassword = () => {
     setErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate all fields
@@ -77,8 +99,26 @@ const ResetPassword = () => {
       return;
     }
 
-    console.log(formData);
-    navigate("/");
+    try {
+      setLoading(true);
+      console.log('Calling resetPasswordAPI with email:', email, 'and password length:', formData.password.length);
+      const response = await resetPasswordAPI(email, formData.password);
+      console.log('Reset Password API Response:', response);
+
+      if (response && response.success) {
+        toast.success("Password reset successful!");
+        localStorage.removeItem("tempUserData");
+        navigate("/");
+      } else {
+        console.error('Response or success property missing:', response);
+        toast.error(response?.message || "Failed to reset password");
+      }
+    } catch (error: unknown) {
+      console.error('Reset password API call failed:', error);
+      showErrorToast(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -150,9 +190,10 @@ const ResetPassword = () => {
 
           <button
             type="submit"
-            className="w-full h-11 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-900/50 mt-6"
+            disabled={loading}
+            className="w-full h-11 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-900/50 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Reset Password
+            {loading ? "Resetting..." : "Reset Password"}
           </button>
         </div>
         </form>

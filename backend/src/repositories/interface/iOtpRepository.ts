@@ -8,4 +8,5 @@ export interface IOtpRepository {
     purpose?: string,
   ): Promise<OtpTypes | null>;
   deleteOtp(email: string): Promise<void>;
+  findOtpByEmail(email: string): Promise<OtpTypes | null>;
 }

@@ -225,7 +225,11 @@ const Loginpage = () => {
                 </div>
 
                 <div className="flex justify-end mb-5 mt-1">
-                  <button className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/forgot-password")}
+                    className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
+                  >
                     Forgot password?
                   </button>
                 </div>

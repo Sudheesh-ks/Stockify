@@ -3,15 +3,33 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { MAIL_EMAIL, MAIL_PASSWORD } = process.env as Record<string, string>;
+const { MAIL_EMAIL, MAIL_PASSWORD } = process.env;
+
+console.log('MAIL_EMAIL:', MAIL_EMAIL ? 'Set' : 'Not set');
+console.log('MAIL_PASSWORD:', MAIL_PASSWORD ? 'Set' : 'Not set');
+
+if (!MAIL_EMAIL || !MAIL_PASSWORD) {
+  console.error('Email configuration missing! MAIL_EMAIL or MAIL_PASSWORD is not set.');
+}
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  auth: { user: MAIL_EMAIL, pass: MAIL_PASSWORD },
+  auth: { user: MAIL_EMAIL || '', pass: MAIL_PASSWORD || '' },
 });
 
 export const sendEmail = async (to: string, subject: string, html: string) => {
-  await transporter.sendMail({ from: MAIL_EMAIL, to, subject, html });
+  if (!MAIL_EMAIL || !MAIL_PASSWORD) {
+    throw new Error('Email configuration is missing');
+  }
+
+  try {
+    const result = await transporter.sendMail({ from: MAIL_EMAIL, to, subject, html });
+    console.log('Email sent successfully:', result.messageId);
+    return result;
+  } catch (error) {
+    console.error('Email send failed:', error);
+    throw error;
+  }
 };
 
 // OTP

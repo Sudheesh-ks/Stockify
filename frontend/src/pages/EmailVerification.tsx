@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, LayoutGrid } from "lucide-react";
+import toast from "react-hot-toast";
+import { showErrorToast } from "../utils/errorHandler";
+import { forgotPasswordAPI } from "../services/authServices";
 import InputField from "../components/LoginComponents/InputField";
 
 const ForgotPassword = () => {
@@ -9,6 +12,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const validateEmail = (value: string) => {
     if (!value) return "Email is required";
@@ -29,13 +33,32 @@ const ForgotPassword = () => {
     setError(validateEmail(email));
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const emailError = validateEmail(email);
     setError(emailError);
     setTouched(true);
 
-    if (!emailError) {
-      navigate("/otp-verification", { state: { email, purpose: "reset-password" } });
+    if (emailError) return;
+
+    try {
+      setLoading(true);
+      console.log('Calling forgotPasswordAPI with email:', email);
+      const response = await forgotPasswordAPI(email);
+      console.log('API Response:', response);
+
+      if (response && response.success) {
+        toast.success("OTP sent to your email");
+        localStorage.setItem("tempUserData", JSON.stringify({ email, purpose: "reset-password" }));
+        navigate("/otp-verification", { state: { email, purpose: "reset-password" } });
+      } else {
+        console.error('Response or success property missing:', response);
+        toast.error(response?.message || "Failed to send OTP");
+      }
+    } catch (error: unknown) {
+      console.error('API call failed:', error);
+      showErrorToast(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,9 +117,10 @@ const ForgotPassword = () => {
 
           <button
             onClick={handleNext}
-            className="w-full h-11 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-900/50 mt-6"
+            disabled={loading}
+            className="w-full h-11 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-900/50 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Send OTP
+            {loading ? "Sending..." : "Send OTP"}
           </button>
         </div>
 

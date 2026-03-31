@@ -2,7 +2,7 @@ import { Mail, Lock } from "lucide-react";
 import InputField from "./InputField";
 
 type LoginFormProps = {
-  onSwitch: () => void;
+  onSwitch: (mode?: string) => void;
   formData: { email: string; password: string };
   errors: { email: string; password: string };
   touched: { email: boolean; password: boolean };
@@ -46,7 +46,10 @@ const LoginForm = ({ onSwitch, formData, errors, touched, onChange, onBlur, load
     />
 
     <div className="flex justify-end mb-5 mt-1">
-      <button className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors">
+      <button
+        onClick={() => onSwitch("forgot")}
+        className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
+      >
         Forgot password?
       </button>
     </div>
@@ -58,7 +61,7 @@ const LoginForm = ({ onSwitch, formData, errors, touched, onChange, onBlur, load
     <p className="text-center text-xs text-gray-600 mt-5">
       Don't have an account?{" "}
       <button
-        onClick={onSwitch}
+        onClick={() => onSwitch("register")}
         className="text-emerald-500 font-semibold hover:text-emerald-400 transition-colors"
       >
         Create one

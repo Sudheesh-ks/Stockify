@@ -43,3 +43,13 @@ export const resendOtpAPI = async (email: string, purpose: string) => {
     const res = await userApi.post(OTP_API.RESEND, { email, purpose });
     return res.data;
 }
+
+export const forgotPasswordAPI = async (email: string) => {
+    const res = await userApi.post(AUTH_API.FORGOT_PASSWORD, { email });
+    return res.data;
+}
+
+export const resetPasswordAPI = async (email: string, newPassword: string) => {
+    const res = await userApi.post(AUTH_API.RESET_PASSWORD, { email, newPassword });
+    return res.data;
+}

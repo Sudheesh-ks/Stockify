@@ -127,7 +127,55 @@ export class AuthService implements IAuthService {
     );
   }
 
-    async loginUser(email: string, password: string): Promise<{ user: UserDTO }> {
+  async forgotPasswordRequest(email: string): Promise<void> {
+    if (!email) {
+      throw new Error(HttpResponse.FIELDS_REQUIRED);
+    }
+    if (!isValidEmail(email)) {
+      throw new Error(HttpResponse.INVALID_EMAIL);
+    }
+
+    const userExists = await this._authRepository.findUserByEmail(email);
+    if (!userExists) {
+      throw new Error(HttpResponse.USER_NOT_FOUND);
+    }
+
+    const otp = generateOTP();
+    console.log("Generated OTP for password reset:", otp);
+    await this._otpRepository.storeOtp(email, {
+      otp,
+      purpose: AuthPurpose.RESET_PASSWORD,
+    });
+    sendOTP(email, otp).catch((err) => console.error("OTP send failed:", err));
+  }
+
+  async resetPassword(email: string, newPassword: string): Promise<void> {
+    if (!email || !newPassword) {
+      throw new Error(HttpResponse.FIELDS_REQUIRED);
+    }
+    if (!isValidEmail(email)) {
+      throw new Error(HttpResponse.INVALID_EMAIL);
+    }
+    if (!isValidPassword(newPassword)) {
+      throw new Error(HttpResponse.INVALID_PASSWORD);
+    }
+
+    const record = await this._otpRepository.findOtpByEmail(email);
+    if (!record || record.purpose !== AuthPurpose.RESET_PASSWORD || record.otp !== "VERIFIED") {
+      throw new Error(HttpResponse.OTP_EXPIRED_OR_INVALID);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const updated = await this._authRepository.updatePasswordByEmail(email, hashedPassword);
+
+    if (!updated) {
+      throw new Error(HttpResponse.USER_NOT_FOUND);
+    }
+
+    await this._otpRepository.deleteOtp(email);
+  }
+
+  async loginUser(email: string, password: string): Promise<{ user: UserDTO }> {
     const user = await this._authRepository.findUserByEmail(email);
     if (!user) throw new Error(HttpResponse.INVALID_CREDENTIALS);
     const isMatch = await bcrypt.compare(password, user.password);

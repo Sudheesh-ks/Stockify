@@ -32,4 +32,8 @@ export class OtpRepository
   async deleteOtp(email: string): Promise<void> {
     await this.deleteOne({ email });
   }
+
+  async findOtpByEmail(email: string): Promise<OtpTypes | null> {
+    return this.findOne({ email });
+  }
 }

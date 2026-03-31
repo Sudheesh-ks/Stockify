@@ -138,6 +138,27 @@ async loginUser(req: Request, res: Response): Promise<void> {
     }
 }
 
+async forgotPasswordRequest(req: Request, res: Response): Promise<void> {
+    const { email } = req.body;
+
+    try {
+        await this._authService.forgotPasswordRequest(email);
+        sendResponse(res, HttpStatus.OK, true, HttpResponse.OTP_SENT);
+    } catch (error) {
+        sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
+    }
+}
+
+async resetPassword(req: Request, res: Response): Promise<void> {
+    const { email, newPassword } = req.body;
+
+    try {
+        await this._authService.resetPassword(email, newPassword);
+        sendResponse(res, HttpStatus.OK, true, HttpResponse.PASSWORD_UPDATED);
+    } catch (error) {
+        sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
+    }
+}
 
 async logoutUser(req: Request, res: Response): Promise<void> {
     res.clearCookie("refreshToken", {

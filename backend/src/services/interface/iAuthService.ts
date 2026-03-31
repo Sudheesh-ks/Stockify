@@ -17,6 +17,10 @@ export interface IAuthService {
 
   resendOtp(email: string): Promise<void>;
 
+  forgotPasswordRequest(email: string): Promise<void>;
+
+  resetPassword(email: string, newPassword: string): Promise<void>;
+
   finalizeRegister(userData: {
     email: string;
     username: string;

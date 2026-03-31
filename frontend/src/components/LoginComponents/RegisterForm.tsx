@@ -2,7 +2,7 @@ import { Lock, Mail, Store, User } from "lucide-react";
 import InputField from "./InputField";
 
 type RegisterFormProps = {
-  onSwitch: () => void;
+  onSwitch: (mode?: string) => void;
   formData: { email: string; username: string; shopname: string; password: string };
   errors: { email: string; username: string; shopname: string; password: string };
   touched: { email: boolean; username: boolean; shopname: boolean; password: boolean };
@@ -76,7 +76,7 @@ const RegisterForm = ({ onSwitch, formData, errors, touched, onChange, onBlur, l
     <p className="text-center text-xs text-gray-600 mt-5">
       Already have an account?{" "}
       <button
-        onClick={onSwitch}
+        onClick={() => onSwitch("login")}
         className="text-emerald-500 font-semibold hover:text-emerald-400 transition-colors"
       >
         Sign in
