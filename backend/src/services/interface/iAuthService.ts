@@ -24,4 +24,6 @@ export interface IAuthService {
     password: string;
   }): Promise<UserDTO>;
   getUserById(id: string): Promise<UserDTO | null>;
+
+  loginUser(email: string, password: string): Promise<{ user: UserDTO }>;
 }

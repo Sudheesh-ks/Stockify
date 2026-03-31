@@ -113,40 +113,40 @@ async resendOtp(req: Request, res: Response): Promise<void> {
 //     }
 // }
 
-// async loginUser(req: Request, res: Response): Promise<void> {
-//     try {
-//         const { email, password } = req.body;
+async loginUser(req: Request, res: Response): Promise<void> {
+    try {
+        const { email, password } = req.body;
 
-//         const { user } = await this._authService.loginUser(email, password);    
+        const { user } = await this._authService.loginUser(email, password);    
 
-//         const accessToken = generateAccessToken(user._id, user.email);
-//         const refreshToken = generateRefreshToken(user._id, user.email);
+        const accessToken = generateAccessToken(user._id!, user.email);
+        const refreshToken = generateRefreshToken(user._id!, user.email);
 
-//         res.cookie("refreshToken", refreshToken, {
-//             httpOnly: true,
-//             secure: process.env.NODE_ENV === "production",
-//             sameSite: "strict",
-//             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-//         });
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
 
-//         sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGIN_SUCCESS, {
-//             accessToken,
-//         });
+        sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGIN_SUCCESS, {
+            accessToken,
+        });
 
-//     } catch (error) {
-//         sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
-//     }
-// }
+    } catch (error) {
+        sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
+    }
+}
 
 
-// async logoutUser(req: Request, res: Response): Promise<void> {
-//     res.clearCookie("refreshToken", {
-//         httpOnly: true,
-//         secure: process.env.NODE_ENV === "production",
-//         sameSite: "strict",
-//     });
-//     sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGOUT_SUCCESS);
-// }
+async logoutUser(req: Request, res: Response): Promise<void> {
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGOUT_SUCCESS);
+}
 
 
 async refreshToken(req: Request, res: Response): Promise<void> {

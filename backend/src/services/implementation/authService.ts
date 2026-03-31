@@ -127,6 +127,18 @@ export class AuthService implements IAuthService {
     );
   }
 
+    async loginUser(email: string, password: string): Promise<{ user: UserDTO }> {
+    const user = await this._authRepository.findUserByEmail(email);
+    if (!user) throw new Error(HttpResponse.INVALID_CREDENTIALS);
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new Error(HttpResponse.INCORRECT_PASSWORD);
+    return { user: toUserDTO(user) };
+  }
+
+  async hashPassword(password: string) {
+    return await bcrypt.hash(password, 10);
+  }
+
   async getUserById(id: string): Promise<UserDTO | null> {
     const user = await this._authRepository.findUserById(id);
     if (!user) return null;

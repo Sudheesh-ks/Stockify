@@ -18,5 +18,10 @@ authRouter.post(
     authController.resendOtp.bind(authController)
 );
 
+authRouter.post(
+    '/login',
+    authController.loginUser.bind(authController)
+);
+
 
 export default authRouter;

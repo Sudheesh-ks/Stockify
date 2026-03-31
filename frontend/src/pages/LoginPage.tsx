@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { LayoutGrid, Mail, Lock, User, Building } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import { loginAPI, registerAPI } from "../services/authServices";
 import { showErrorToast } from "../utils/errorHandler";
+import { useAuth } from "../hooks/useAuth";
+import { validationSchema } from "../utils/validationSchema";
+import * as Yup from "yup";
 
 const Loginpage = () => {
   const [tab, setTab] = useState("login");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, register, loading } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,98 +32,82 @@ const Loginpage = () => {
     password: false,
   });
 
-  const validateField = (name: string, value: string) => {
-    let error = "";
-
-    switch (name) {
-      case "email":
-        if (!value) error = "Email is required";
-        else if (!/\S+@\S+\.\S+/.test(value)) error = "Invalid email format";
-        break;
-      case "username":
-        if (!value) error = "Name is required";
-        else if (value.length < 4) error = "Name must be at least 4 characters";
-        else if (value.length > 30) error = "Name must not exceed 30 characters";
-        break;
-      case "shopname":
-        if (!value) error = "Shop name is required";
-        else if (value.length < 4) error = "Shop name must be at least 4 characters";
-        else if (value.length > 50) error = "Shop name must not exceed 50 characters";
-        break;
-      case "password":
-        if (!value) error = "Password is required";
-        else if (value.length < 6) error = "Password must be at least 6 characters";
-        else if (!/[A-Z]/.test(value)) error = "At least one uppercase required";
-        else if (!/[a-z]/.test(value)) error = "At least one lowercase required";
-        else if (!/[0-9]/.test(value)) error = "At least one number required";
-        else if (!/[@$!%*?&]/.test(value)) error = "At least one special character required";
-        break;
+  const validateField = async (name: string, value: string) => {
+    try {
+      // Create a temporary object with just the field we want to validate
+      const tempObject = { [name]: value };
+      const tempSchema = Yup.object({ [name]: Yup.reach(validationSchema, name) });
+      await tempSchema.validate(tempObject);
+      return "";
+    } catch (error) {
+      showErrorToast(error);
+      return (error as Error).message || "Invalid field";
     }
-
-    return error;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
     if (touched[name as keyof typeof touched]) {
-      const error = validateField(name, value);
+      const error = await validateField(name, value);
       setErrors(prev => ({ ...prev, [name]: error }));
     }
   };
 
-  const handleBlur = (name: string) => {
+  const handleBlur = async (name: string) => {
     setTouched(prev => ({ ...prev, [name]: true }));
-    const error = validateField(name, formData[name as keyof typeof formData]);
+    const error = await validateField(name, formData[name as keyof typeof formData]);
     setErrors(prev => ({ ...prev, [name]: error }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate all fields
-    const newErrors = {
-      email: validateField("email", formData.email),
-      username: validateField("username", formData.username),
-      shopname: validateField("shopname", formData.shopname),
-      password: validateField("password", formData.password),
-    };
-
-    setErrors(newErrors);
-    setTouched({ email: true, username: true, shopname: true, password: true });
-
-    // Check if there are any errors
-    const hasErrors = Object.values(newErrors).some(error => error !== "");
-
-    if (hasErrors) {
-      toast.error("Please fix the errors before submitting");
-      return;
-    }
-
-    setLoading(true);
     try {
+      // Validate form based on the current tab
       if (tab === "login") {
-        const res = await loginAPI(formData.email, formData.password);
-
-        if (res.success) {
-          localStorage.setItem("token", res.token);
-          toast.success("Login successful!");
-          navigate("/dashboard");
-        }
+        // Validate only email and password for login
+        const emailSchema = Yup.object({ email: Yup.reach(validationSchema, 'email') });
+        const passwordSchema = Yup.object({ password: Yup.reach(validationSchema, 'password') });
+        await emailSchema.validate({ email: formData.email });
+        await passwordSchema.validate({ password: formData.password });
       } else {
-        const res = await registerAPI(formData);
-
-        if (res.success) {
-          toast.success(res.message);
-          navigate("/otp-verification", { state: { email: formData.email, purpose: "register" } });
-        }
+        // Validate all fields for registration
+        await validationSchema.validate(formData);
       }
-    } catch (error: unknown) {
-      console.error(error);
+
+      // Clear errors if validation passes
+      setErrors({
+        email: "",
+        username: "",
+        shopname: "",
+        password: "",
+      });
+
+      // Proceed with login or register
+      if (tab === "login") {
+        await login(formData.email, formData.password);
+        navigate("/dashboard");
+      } else {
+        await register(formData);
+        navigate("/otp-verification", {
+          state: { email: formData.email, purpose: "register" }
+        });
+      }
+    } catch (error) {
       showErrorToast(error);
-    } finally {
-      setLoading(false);
+      // If it's a validation error, update the errors state
+      if ((error as { path?: string }).path) {
+        const errorPath = (error as { path?: string }).path!;
+        const errorMessage = (error as { message?: string }).message || "Invalid field";
+        setErrors(prev => ({ ...prev, [errorPath]: errorMessage }));
+        setTouched(prev => ({ ...prev, [errorPath]: true }));
+      } else {
+        // If it's an API error, show error toast
+        console.error(error);
+        showErrorToast(error);
+      }
     }
   };
 

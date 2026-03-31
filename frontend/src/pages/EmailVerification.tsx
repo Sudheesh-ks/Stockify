@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, LayoutGrid } from "lucide-react";
 import InputField from "../components/LoginComponents/InputField";
@@ -5,8 +6,37 @@ import InputField from "../components/LoginComponents/InputField";
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [touched, setTouched] = useState(false);
+
+  const validateEmail = (value: string) => {
+    if (!value) return "Email is required";
+    if (!/\S+@\S+\.\S+/.test(value)) return "Invalid email format";
+    return "";
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (touched) {
+      setError(validateEmail(value));
+    }
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
+    setError(validateEmail(email));
+  };
+
   const handleNext = () => {
-    navigate("/otp-verification");
+    const emailError = validateEmail(email);
+    setError(emailError);
+    setTouched(true);
+
+    if (!emailError) {
+      navigate("/otp-verification", { state: { email, purpose: "reset-password" } });
+    }
   };
 
   return (
@@ -51,9 +81,15 @@ const ForgotPassword = () => {
 
           <InputField
             label="Email"
+            name="email"
             type="email"
             placeholder="you@example.com"
             Icon={Mail}
+            value={email}
+            error={error}
+            touched={touched}
+            onChange={handleChange}
+            onBlur={handleBlur}
           />
 
           <button
