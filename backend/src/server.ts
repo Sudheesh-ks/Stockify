@@ -6,6 +6,7 @@ import { connectDB } from './config/mongodb';
 import authRouter from './routes/auth.routes';
 import productRouter from './routes/product.routes';
 import customerRouter from './routes/customer.routes';
+import saleRouter from './routes/sale.routes';
 dotenv.config();
 
 const app = express();
@@ -30,6 +31,7 @@ app.get('/', (req,res) => {
 app.use('/api', authRouter);
 app.use('/api/products', productRouter);
 app.use('/api/customers', customerRouter);
+app.use('/api/sales', saleRouter);
 
 
 app.listen(PORT, () => {

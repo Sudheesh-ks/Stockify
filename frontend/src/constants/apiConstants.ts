@@ -26,3 +26,9 @@ export const CUSTOMER_API = {
     UPDATE: (id: string) => `/api/customers/customer/${id}`,
     DELETE: (id: string) => `/api/customers/customer/${id}`
 }
+
+export const SALE_API = {
+    CREATE: '/api/sales',
+    GET_ALL: '/api/sales',
+    GET_BY_CUSTOMER: (name: string) => `/api/sales/customer/${name}`
+}

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Package, ShoppingCart } from "lucide-react";
+import { ShoppingCart, LayoutDashboard, Users, Package, PieChart } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
@@ -7,6 +7,7 @@ const Sidebar = () => {
     { name: "Customers", icon: Users, path: "/customers" },
     { name: "Products", icon: Package, path: "/products" },
     { name: "Sales", icon: ShoppingCart, path: "/sales" },
+    { name: "Reports", icon: PieChart, path: "/reports" },
   ];
 
   return (

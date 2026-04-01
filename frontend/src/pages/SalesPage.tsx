@@ -1,0 +1,256 @@
+import { useState, useEffect } from "react";
+import { Plus, ShoppingCart } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+
+// Layout
+import DashboardLayout from "../layout/DashboardLayout";
+
+// Components
+import SearchBar from "../components/SearchBar";
+import DataTable from "../components/DataTable";
+import type { Column } from "../components/DataTable";
+import Pagination from "../components/Pagination";
+import AddEditModal from "../components/AddEditModal";
+import type { SaleTypes } from "../types/sale";
+import type { ProductTypes } from "../types/product";
+import { getAllProductsAPI } from "../services/productServices";
+import { createSaleAPI, getAllSalesAPI } from "../services/saleServices";
+import { showErrorToast } from "../utils/errorHandler";
+
+const ITEMS_PER_PAGE = 8;
+
+const SaleSchema = Yup.object().shape({
+    productId: Yup.string().required("Product is required"),
+    quantity: Yup.number().min(1, "Quantity must be at least 1").required("Required"),
+    customerName: Yup.string().optional(),
+});
+
+const SalesPage = () => {
+    const [sales, setSales] = useState<SaleTypes[]>([]);
+    const [products, setProducts] = useState<ProductTypes[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const fetchInitialData = async () => {
+        try {
+            const prodData = await getAllProductsAPI("", 1, 100);
+            setProducts(prodData.products || []);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
+    const fetchSales = async () => {
+        try {
+            const data = await getAllSalesAPI({
+                customerName: searchQuery,
+                page: currentPage,
+                limit: ITEMS_PER_PAGE
+            });
+            setSales(data.sales || []);
+            setTotalPages(data.totalPages || 1);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchInitialData();
+    }, []);
+
+    useEffect(() => {
+        const debounceTimer = setTimeout(() => {
+            fetchSales();
+        }, 500);
+        return () => clearTimeout(debounceTimer);
+    }, [searchQuery, currentPage]);
+
+    const handleSave = async (values: { productId: string, quantity: number, customerName?: string }) => {
+        try {
+            await createSaleAPI(values);
+            toast.success("Sale recorded successfully!");
+            fetchSales();
+            fetchInitialData(); // Refresh product quantities
+            setIsModalOpen(false);
+        } catch (error) {
+            showErrorToast(error);
+        }
+    };
+
+    const columns: Column<SaleTypes>[] = [
+        { 
+            header: "Date", 
+            accessor: (s: SaleTypes) => new Date(s.date).toLocaleDateString(),
+            className: "text-gray-400 text-sm"
+        },
+        { 
+            header: "Product", 
+            accessor: "productName", 
+            className: "font-bold text-white flex items-center gap-2" 
+        },
+        { 
+            header: "Quantity", 
+            accessor: (s: SaleTypes) => (
+                <span className="text-emerald-400 font-medium">x{s.quantity}</span>
+            )
+        },
+        { 
+            header: "Unit Price", 
+            accessor: (s: SaleTypes) => `$${s.price.toFixed(2)}`,
+            className: "text-gray-300"
+        },
+        { 
+            header: "Total", 
+            accessor: (s: SaleTypes) => `$${s.totalAmount.toFixed(2)}`,
+            className: "text-white font-bold"
+        },
+        { 
+            header: "Buyer", 
+            accessor: "customerName",
+            className: "text-gray-400 italic"
+        },
+    ];
+
+    return (
+        <DashboardLayout>
+            <div className="flex flex-col gap-6">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+                            <ShoppingCart className="w-6 h-6 text-emerald-400" />
+                            Sales History
+                        </h1>
+                        <p className="text-gray-400 text-sm">Track all your sales and manage customer transactions.</p>
+                    </div>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-[#05070d] font-bold rounded-lg transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Record New Sale
+                    </button>
+                </div>
+
+                {/* Toolbar & Data Table */}
+                <div className="flex flex-col gap-4">
+                    <div className="flex justify-between items-center bg-[#0d1117] p-4 rounded-xl border border-[#1a1f2a]">
+                        <SearchBar 
+                            value={searchQuery} 
+                            onChange={(v) => { setSearchQuery(v); setCurrentPage(1); }} 
+                            placeholder="Search by customer name..." 
+                        />
+                    </div>
+
+                    <DataTable
+                        data={sales}
+                        columns={columns}
+                        emptyMessage="No sales recorded yet."
+                    />
+
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                    />
+                </div>
+            </div>
+
+            {/* Add Sale Modal */}
+            <AddEditModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Record New Sale"
+            >
+                <Formik
+                    initialValues={{
+                        productId: "",
+                        quantity: 1,
+                        customerName: "Cash",
+                    }}
+                    validationSchema={SaleSchema}
+                    onSubmit={handleSave}
+                >
+                    {({ errors, touched, isSubmitting, values, setFieldValue }) => (
+                        <Form className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Select Product</label>
+                                <Field
+                                    as="select"
+                                    name="productId"
+                                    className={`w-full bg-[#151b23] border ${errors.productId && touched.productId ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                                    onChange={(e: any) => {
+                                        const val = e.target.value;
+                                        setFieldValue("productId", val);
+                                    }}
+                                >
+                                    <option value="" disabled>Choose a product...</option>
+                                    {products.map((p) => (
+                                        <option key={p._id} value={p._id}>
+                                            {p.name} (Stock: {p.quantity}) - ${p.price}
+                                        </option>
+                                    ))}
+                                </Field>
+                                <ErrorMessage name="productId" component="div" className="text-xs text-red-500 mt-1" />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-1">Quantity</label>
+                                    <Field
+                                        name="quantity"
+                                        type="number"
+                                        className={`w-full bg-[#151b23] border ${errors.quantity && touched.quantity ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                                    />
+                                    <ErrorMessage name="quantity" component="div" className="text-xs text-red-500 mt-1" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-1">Total Amount ($)</label>
+                                    <div className="w-full bg-[#0d1117] border border-[#1a1f2a] p-2.5 rounded-lg text-emerald-400 font-bold">
+                                        {(() => {
+                                            const prod = products.find(p => p._id === values.productId);
+                                            return prod ? (prod.price * (values.quantity || 0)).toFixed(2) : "0.00";
+                                        })()}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-1">Buyer (Customer Name or 'Cash')</label>
+                                <Field
+                                    name="customerName"
+                                    className={`w-full bg-[#151b23] border ${errors.customerName && touched.customerName ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                                    placeholder="Enter 'Cash' or Customer name"
+                                />
+                                <ErrorMessage name="customerName" component="div" className="text-xs text-red-500 mt-1" />
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="flex-1 px-4 py-2.5 border border-[#1a1f2a] text-gray-400 hover:text-white hover:bg-[#151b23] rounded-lg transition-all font-semibold"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-[#05070d] font-bold rounded-lg transition-all disabled:opacity-50 active:scale-95"
+                                >
+                                    Record Sale
+                                </button>
+                            </div>
+                        </Form>
+                    )}
+                </Formik>
+            </AddEditModal>
+        </DashboardLayout>
+    );
+};
+
+export default SalesPage;

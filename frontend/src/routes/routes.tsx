@@ -8,6 +8,8 @@ import ProtectedRoute from "./ProtectedRoutes"
 import PublicRoute from "./PublicRoute"
 import ProductsPage from "../pages/ProductsPage"
 import CustomersPage from "../pages/CustomersPage"
+import SalesPage from "../pages/SalesPage"
+import ReportsPage from "../pages/ReportsPage"
 
 const UserRoutes = () => {
     return (
@@ -48,6 +50,18 @@ const UserRoutes = () => {
             <Route path="/products" element={
                 <ProtectedRoute>
                     <ProductsPage />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/sales" element={
+                <ProtectedRoute>
+                    <SalesPage />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/reports" element={
+                <ProtectedRoute>
+                    <ReportsPage />
                 </ProtectedRoute>
             } />
         </Routes>
