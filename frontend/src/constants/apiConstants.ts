@@ -18,3 +18,11 @@ export const PRODUCT_API = {
     UPDATE: (id: string) => `/api/products/product/${id}`,
     DELETE: (id: string) => `/api/products/product/${id}`
 }
+
+export const CUSTOMER_API = {
+    CREATE: '/api/customers/customer',
+    GET_ALL: '/api/customers/customer',
+    GET_BY_ID: (id: string) => `/api/customers/customer/${id}`,
+    UPDATE: (id: string) => `/api/customers/customer/${id}`,
+    DELETE: (id: string) => `/api/customers/customer/${id}`
+}

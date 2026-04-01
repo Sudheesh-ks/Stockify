@@ -47,4 +47,12 @@ export const HttpResponse = {
   PRODUCT_DELETED: 'Product deleted successfully',
   PRODUCT_FOUND: 'Product found successfully',
   PRODUCTS_FOUND: 'Products found successfully',
+
+  // Customer related
+  CUSTOMER_CREATED: 'Customer created successfully',
+  CUSTOMER_NOT_FOUND: 'Customer not found',
+  CUSTOMER_UPDATED: 'Customer updated successfully',
+  CUSTOMER_DELETED: 'Customer deleted successfully',
+  CUSTOMER_FOUND: 'Customer found successfully',
+  CUSTOMERS_FOUND: 'Customers found successfully',
 };

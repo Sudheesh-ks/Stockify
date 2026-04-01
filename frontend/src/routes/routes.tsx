@@ -7,6 +7,7 @@ import Dashboard from "../pages/Dashboard"
 import ProtectedRoute from "./ProtectedRoutes"
 import PublicRoute from "./PublicRoute"
 import ProductsPage from "../pages/ProductsPage"
+import CustomersPage from "../pages/CustomersPage"
 
 const UserRoutes = () => {
     return (
@@ -35,6 +36,12 @@ const UserRoutes = () => {
             <Route path="/dashboard" element={
                 <ProtectedRoute>
                     <Dashboard />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/customers" element={
+                <ProtectedRoute>
+                    <CustomersPage />
                 </ProtectedRoute>
             } />
 
