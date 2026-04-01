@@ -3,5 +3,4 @@ export interface UserDTO {
     email: string;
     username: string;
     shopname: string;
-    password: string;
 }

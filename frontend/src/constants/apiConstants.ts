@@ -10,3 +10,11 @@ export const OTP_API = {
     VERIFY: '/api/verify-otp',
     RESEND: '/api/resend-otp'
 }
+
+export const PRODUCT_API = {
+    CREATE: '/api/products/product',
+    GET_ALL: '/api/products/product',
+    GET_BY_ID: (id: string) => `/api/products/product/${id}`,
+    UPDATE: (id: string) => `/api/products/product/${id}`,
+    DELETE: (id: string) => `/api/products/product/${id}`
+}

@@ -1,6 +1,6 @@
 import { Model, UpdateQuery, HydratedDocument  } from 'mongoose';
 
-type FilterQuery<T> = Partial<Record<keyof T, any>>;
+type FilterQuery<T> = any; // Using any to allow complex Mongoose queries like $or, $regex, etc.
 
 export class BaseRepository<T> {
   constructor(protected model: Model<T>) {}
@@ -22,12 +22,12 @@ export class BaseRepository<T> {
     return ( await created.save()) as HydratedDocument<T>;
   }
 
-  async updateById(id: string, update: UpdateQuery<T>): Promise<void> {
-    await this.model.findByIdAndUpdate(id, update).exec();
+  async updateById(id: string, update: UpdateQuery<T>): Promise<HydratedDocument<T> | null> {
+    return await this.model.findByIdAndUpdate(id, update, {new: true}).exec();
   }
 
-  async deleteById(id: string): Promise<void> {
-    await this.model.findByIdAndDelete(id).exec();
+  async deleteById(id: string): Promise<HydratedDocument<T> | null> {
+    return await this.model.findByIdAndDelete(id).exec();
   }
 
     async findOneAndUpdate(
@@ -36,6 +36,10 @@ export class BaseRepository<T> {
     options: object = {}
   ): Promise<HydratedDocument<T> | null> {
     return this.model.findOneAndUpdate(filter, update, options).exec();
+  }
+
+  async countDocuments(filter: FilterQuery<T> = {}): Promise<number> {
+    return this.model.countDocuments(filter).exec();
   }
 
   async deleteOne(filter: FilterQuery<T>): Promise<void> {

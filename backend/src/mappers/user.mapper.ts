@@ -7,6 +7,5 @@ export const toUserDTO = (user: userDocument): UserDTO => {
         email: user.email,
         username: user.username,
         shopname: user.shopname,
-        password: user.password,
     }
 }

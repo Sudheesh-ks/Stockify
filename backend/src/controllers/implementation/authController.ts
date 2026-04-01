@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { IAuthController } from "../interface/IAuthController";
 import { HttpStatus } from "../../constants/status.constants";
 import { HttpResponse } from "../../constants/responseMessage.constants";
 import { sendResponse } from "../../utils/apiResponse.util";
 import { AuthPurpose } from "../../constants/authPurpose.constants";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../../utils/jwt.util";
 import { IAuthService } from "../../services/interface/iAuthService";
+import { IAuthController } from "../interface/iAuthController";
 
 export class AuthController implements IAuthController {
   constructor(private readonly _authService: IAuthService) {}

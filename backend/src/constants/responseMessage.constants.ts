@@ -39,4 +39,12 @@ export const HttpResponse = {
   OTP_RESENT: 'OTP resent successfully',
   OTP_NOT_FOUND: 'No pending OTP found',
   OTP_EXPIRED_OR_INVALID: 'OTP not verified or expired',
+
+  // Product related
+  PRODUCT_CREATED: 'Product created successfully',
+  PRODUCT_NOT_FOUND: 'Product not found',
+  PRODUCT_UPDATED: 'Product updated successfully',
+  PRODUCT_DELETED: 'Product deleted successfully',
+  PRODUCT_FOUND: 'Product found successfully',
+  PRODUCTS_FOUND: 'Products found successfully',
 };

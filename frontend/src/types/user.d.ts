@@ -1,4 +1,4 @@
-export type AuthValues = {
+export type UserTypes = {
   email: string;
   username: string;
   shopname: string;

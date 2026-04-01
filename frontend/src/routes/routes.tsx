@@ -6,6 +6,7 @@ import ResetPassword from "../pages/ResetPassword"
 import Dashboard from "../pages/Dashboard"
 import ProtectedRoute from "./ProtectedRoutes"
 import PublicRoute from "./PublicRoute"
+import ProductsPage from "../pages/ProductsPage"
 
 const UserRoutes = () => {
     return (
@@ -34,6 +35,12 @@ const UserRoutes = () => {
             <Route path="/dashboard" element={
                 <ProtectedRoute>
                     <Dashboard />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/products" element={
+                <ProtectedRoute>
+                    <ProductsPage />
                 </ProtectedRoute>
             } />
         </Routes>
