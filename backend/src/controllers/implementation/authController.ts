@@ -87,32 +87,6 @@ async resendOtp(req: Request, res: Response): Promise<void> {
     }
 }
 
-
-// async forgotPassword(req: Request, res: Response): Promise<void> {
-//     try {
-//         const { email } = req.body;
-
-//         await this._authService.forgotPassword(email);
-
-//         sendResponse(res, HttpStatus.OK, true, HttpResponse.OTP_SENT);
-//     } catch (error) {
-//         sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.OTP_SEND_FAILED, null, error);
-//     }
-// }
-
-
-// async resetPassword(req: Request, res: Response): Promise<void> {
-//     try {
-//         const { email, newPassword } = req.body;
-
-//         await this._authService.resetPassword(email, newPassword);
-
-//         sendResponse(res, HttpStatus.OK, true, HttpResponse.PASSWORD_UPDATED);
-//     } catch (error) {
-//         sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.OTP_EXPIRED_OR_INVALID, null, error);
-//     }
-// }
-
 async loginUser(req: Request, res: Response): Promise<void> {
     try {
         const { email, password } = req.body;
