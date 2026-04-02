@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { loginAPI, registerAPI } from '../services/authServices';
+import { loginAPI, registerAPI, verifyOtpAPI } from '../services/authServices';
 import toast from 'react-hot-toast';
 import { showErrorToast } from '../utils/errorHandler';
 
@@ -28,6 +28,7 @@ interface AuthContextData {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   checkAuthState: () => void;
+  verifyOtp: (email: string, otp: string, purpose: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextData | undefined>(undefined);
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(response.message || 'Login failed');
       }
 
-      const { token: accessToken, user: userData } = response;
+      const { accessToken, user: userData } = response.data;
       localStorage.setItem('token', accessToken);
       setToken(accessToken);
       setUser(userData);
@@ -103,6 +104,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const verifyOtp = async (email: string, otp: string, purpose: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await verifyOtpAPI(email, otp, purpose);
+
+      if (!response.success) {
+        throw new Error(response.message || 'OTP verification failed');
+      }
+
+      // If purpose is register, the backend returns token and user
+      if (purpose === 'register' && response.data) {
+        const { accessToken, user: userData } = response.data;
+        if (accessToken) {
+          localStorage.setItem('token', accessToken);
+          setToken(accessToken);
+          setUser(userData);
+          setIsAuthenticated(true);
+        }
+      }
+
+      return response;
+    } catch (err: unknown) {
+      showErrorToast(err);
+      setError('OTP verification failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -124,6 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         checkAuthState,
+        verifyOtp,
       }}
     >
       {children}

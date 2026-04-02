@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutGrid } from "lucide-react";
 import toast from "react-hot-toast";
-import { resendOtpAPI, verifyOtpAPI } from "../services/authServices";
+import { resendOtpAPI } from "../services/authServices";
 import { showErrorToast } from "../utils/errorHandler";
+import { useAuth } from "../hooks/useAuth";
 
 const OTPVerification = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const OTPVerification = () => {
 
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [timer, setTimer] = useState(60);
-  const [loading, setLoading] = useState(false);
+  const { verifyOtp, loading } = useAuth();
 
   // Timer
   useEffect(() => {
@@ -55,15 +56,13 @@ const OTPVerification = () => {
     }
 
     try {
-      setLoading(true);
-
-      const res = await verifyOtpAPI(email, enteredOtp, purpose);
+      const res = await verifyOtp(email, enteredOtp, purpose);
       console.log("OTP verify response:", res);
 
       if (res.success) {
         toast.success("OTP verified successfully!");
 
-        const purposeValue = res.data?.data?.purpose || purpose;
+        const purposeValue = res.data?.purpose || purpose;
 
         if (purposeValue === "register") {
           navigate("/dashboard");
@@ -79,11 +78,8 @@ const OTPVerification = () => {
         return;
       }
 
-      toast.error(res.data?.message || "OTP verification failed.");
     } catch (err: unknown) {
-      showErrorToast(err);
-    } finally {
-      setLoading(false);
+      // showErrorToast is handled in verifyOtp context
     }
   };
 

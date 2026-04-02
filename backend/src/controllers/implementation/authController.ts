@@ -58,6 +58,7 @@ export class AuthController implements IAuthController {
 
             sendResponse(res, HttpStatus.OK, true, HttpResponse.REGISTER_SUCCESS, {
                 accessToken,
+                user: result.user,
             });
             return;
         }
@@ -105,6 +106,7 @@ async loginUser(req: Request, res: Response): Promise<void> {
 
         sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGIN_SUCCESS, {
             accessToken,
+            user,
         });
 
     } catch (error) {

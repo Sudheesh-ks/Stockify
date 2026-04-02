@@ -24,7 +24,7 @@ export const refreshTokenAPI = async () => {
         const res = await userApi.get(AUTH_API.REFRESH_TOKEN, {
             withCredentials: true,
         });
-        const accessToken = res.data.accessToken;
+        const accessToken = res.data.data.accessToken;
         localStorage.setItem("token", accessToken);
         return accessToken;
     } catch (error) {
