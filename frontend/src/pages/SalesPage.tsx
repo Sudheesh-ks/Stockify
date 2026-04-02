@@ -13,6 +13,7 @@ import DataTable from "../components/DataTable";
 import type { Column } from "../components/DataTable";
 import Pagination from "../components/Pagination";
 import AddEditModal from "../components/AddEditModal";
+import SearchableSelect from "../components/SearchableSelect";
 import type { SaleTypes } from "../types/sale";
 import type { ProductTypes } from "../types/product";
 import { getAllProductsAPI } from "../services/productServices";
@@ -29,18 +30,39 @@ const SaleSchema = Yup.object().shape({
 
 const SalesPage = () => {
     const [sales, setSales] = useState<SaleTypes[]>([]);
-    const [products, setProducts] = useState<ProductTypes[]>([]);
+    const [selectedProduct, setSelectedProduct] = useState<ProductTypes | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const fetchInitialData = async () => {
+    const handleProductSearch = async (query: string) => {
         try {
-            const prodData = await getAllProductsAPI("", 1, 100);
-            setProducts(prodData.products || []);
+            const data = await getAllProductsAPI(query, 1, 10);
+            return data.products.map((p: ProductTypes) => ({
+                value: p._id,
+                label: p.name,
+                subLabel: `Stock: ${p.quantity} | Price: $${p.price}`,
+                original: p
+            }));
         } catch (error) {
-            showErrorToast(error);
+            console.error("Product search failed:", error);
+            return [];
+        }
+    };
+
+    const handleCustomerSearch = async (query: string) => {
+        try {
+            const { getAllCustomersAPI } = await import("../services/customerServices");
+            const data = await getAllCustomersAPI(query, 1, 10);
+            return data.customers.map((c: any) => ({
+                value: c.name, // We use name as value as backend expects customerName
+                label: c.name,
+                subLabel: c.email
+            }));
+        } catch (error) {
+            console.error("Customer search failed:", error);
+            return [];
         }
     };
 
@@ -59,7 +81,7 @@ const SalesPage = () => {
     };
 
     useEffect(() => {
-        fetchInitialData();
+        // fetchInitialData removed - moved to backend search
     }, []);
 
     useEffect(() => {
@@ -74,8 +96,8 @@ const SalesPage = () => {
             await createSaleAPI(values);
             toast.success("Sale recorded successfully!");
             fetchSales();
-            fetchInitialData(); // Refresh product quantities
             setIsModalOpen(false);
+            setSelectedProduct(null);
         } catch (error) {
             showErrorToast(error);
         }
@@ -177,26 +199,17 @@ const SalesPage = () => {
                 >
                     {({ errors, touched, isSubmitting, values, setFieldValue }) => (
                         <Form className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Select Product</label>
-                                <Field
-                                    as="select"
-                                    name="productId"
-                                    className={`w-full bg-[#151b23] border ${errors.productId && touched.productId ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
-                                    onChange={(e: any) => {
-                                        const val = e.target.value;
-                                        setFieldValue("productId", val);
-                                    }}
-                                >
-                                    <option value="" disabled>Choose a product...</option>
-                                    {products.map((p) => (
-                                        <option key={p._id} value={p._id}>
-                                            {p.name} (Stock: {p.quantity}) - ${p.price}
-                                        </option>
-                                    ))}
-                                </Field>
-                                <ErrorMessage name="productId" component="div" className="text-xs text-red-500 mt-1" />
-                            </div>
+                            <SearchableSelect
+                                label="Select Product"
+                                placeholder="Search by product name..."
+                                onSearch={handleProductSearch}
+                                onSelect={(opt) => {
+                                    setFieldValue("productId", opt?.value || "");
+                                    setSelectedProduct(opt?.original || null);
+                                }}
+                                error={errors.productId}
+                                touched={touched.productId}
+                            />
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -211,23 +224,24 @@ const SalesPage = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-1">Total Amount ($)</label>
                                     <div className="w-full bg-[#0d1117] border border-[#1a1f2a] p-2.5 rounded-lg text-emerald-400 font-bold">
-                                        {(() => {
-                                            const prod = products.find(p => p._id === values.productId);
-                                            return prod ? (prod.price * (values.quantity || 0)).toFixed(2) : "0.00";
-                                        })()}
+                                        {selectedProduct ? (selectedProduct.price * (values.quantity || 0)).toFixed(2) : "0.00"}
                                     </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-400 mb-1">Buyer (Customer Name or 'Cash')</label>
-                                <Field
-                                    name="customerName"
-                                    className={`w-full bg-[#151b23] border ${errors.customerName && touched.customerName ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
-                                    placeholder="Enter 'Cash' or Customer name"
-                                />
-                                <ErrorMessage name="customerName" component="div" className="text-xs text-red-500 mt-1" />
-                            </div>
+                            <SearchableSelect
+                                label="Customer / Buyer"
+                                placeholder="Search existing or type name (e.g. Cash)"
+                                defaultValue="Cash"
+                                allowCustom={true}
+                                onSearch={handleCustomerSearch}
+                                onSelect={(opt) => {
+                                    // Use setFieldValue to update customerName correctly
+                                    setFieldValue("customerName", opt?.value || "");
+                                }}
+                                error={errors.customerName}
+                                touched={touched.customerName}
+                            />
 
                             <div className="flex gap-3 pt-4">
                                 <button
