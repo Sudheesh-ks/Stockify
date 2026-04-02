@@ -11,34 +11,39 @@ export class CustomerRepository extends BaseRepository<CustomerDocument> impleme
         return this.create(customer);
     }
 
-    async updateCustomer(id: string, customer: Partial<CustomerDocument>): Promise<CustomerDocument> {
-        const updated = await this.updateById(id, customer);
-        if (!updated) throw new Error("Customer not found");
+    async updateCustomer(id: string, userId: string, customer: Partial<CustomerDocument>): Promise<CustomerDocument> {
+        const updated = await this.findOneAndUpdate({ _id: id, userId }, customer, { new: true });
+        if (!updated) throw new Error("Customer not found or unauthorized");
         return updated;
     }
 
-    async deleteCustomer(id: string): Promise<CustomerDocument> {
-        const deleted = await this.deleteById(id);
-        if (!deleted) throw new Error("Customer not found");
+    async deleteCustomer(id: string, userId: string): Promise<CustomerDocument> {
+        const deleted = await this.model.findOneAndDelete({ _id: id, userId }).exec();
+        if (!deleted) throw new Error("Customer not found or unauthorized");
         return deleted;
     }
 
-    async getCustomer(id: string): Promise<CustomerDocument> {
-        const customer = await this.findById(id);
-        if (!customer) throw new Error("Customer not found");
+    async getCustomer(id: string, userId: string): Promise<CustomerDocument> {
+        const customer = await this.findOne({ _id: id, userId });
+        if (!customer) throw new Error("Customer not found or unauthorized");
         return customer;
     }
 
-    async getAllCustomers(search?: string, page?: number, limit?: number): Promise<{ customers: CustomerDocument[], totalCount: number }> {
-        const query = search
-            ? {
-                  $or: [
-                      { name: { $regex: search, $options: "i" } },
-                      { address: { $regex: search, $options: "i" } },
-                      { mobile: { $regex: search, $options: "i" } },
-                  ],
-              }
-            : {};
+    async getAllCustomers(userId: string, search?: string, page?: number, limit?: number): Promise<{ customers: CustomerDocument[], totalCount: number }> {
+        const query: any = { userId };
+        
+        if (search) {
+            query.$and = [
+                { userId },
+                {
+                    $or: [
+                        { name: { $regex: search, $options: "i" } },
+                        { address: { $regex: search, $options: "i" } },
+                        { mobile: { $regex: search, $options: "i" } },
+                    ],
+                }
+            ];
+        }
 
         const totalCount = await this.countDocuments(query);
         let customersQuery = this.model.find(query);

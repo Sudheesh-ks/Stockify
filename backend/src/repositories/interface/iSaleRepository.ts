@@ -1,7 +1,7 @@
-import { SaleDocument } from "../../../models/salesModel";
+import { SaleDocument } from "../../models/salesModel";
 
 export interface ISaleRepository {
-    createSale(sale: Partial<SaleDocument>): Promise<SaleDocument>;
-    getAllSales(filter?: any, page?: number, limit?: number): Promise<{ sales: SaleDocument[], totalCount: number }>;
-    getSalesByCustomer(customerName: string): Promise<SaleDocument[]>;
+    createSale(userId: string, sale: Partial<SaleDocument>): Promise<SaleDocument>;
+    getAllSales(userId: string, filter?: any, page?: number, limit?: number): Promise<{ sales: SaleDocument[], totalCount: number }>;
+    getSalesByCustomer(userId: string, customerName: string): Promise<SaleDocument[]>;
 }

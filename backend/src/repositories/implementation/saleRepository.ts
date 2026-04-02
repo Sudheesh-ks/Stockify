@@ -7,14 +7,15 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
         super(salesModel);
     }
 
-    async createSale(sale: Partial<SaleDocument>): Promise<SaleDocument> {
-        return this.create(sale);
+    async createSale(userId: string, sale: Partial<SaleDocument>): Promise<SaleDocument> {
+        return this.create({ ...sale, userId: userId as any });
     }
 
-    async getAllSales(filter: any = {}, page: number = 1, limit: number = 5): Promise<{ sales: SaleDocument[], totalCount: number }> {
-        const totalCount = await this.countDocuments(filter);
+    async getAllSales(userId: string, filter: any = {}, page: number = 1, limit: number = 5): Promise<{ sales: SaleDocument[], totalCount: number }> {
+        const query = { ...filter, userId };
+        const totalCount = await this.countDocuments(query);
         
-        const sales = await this.model.find(filter)
+        const sales = await this.model.find(query)
             .sort({ date: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
@@ -24,8 +25,11 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
         return { sales, totalCount };
     }
 
-    async getSalesByCustomer(customerName: string): Promise<SaleDocument[]> {
-        return this.model.find({ customerName: { $regex: customerName, $options: 'i' } })
+    async getSalesByCustomer(userId: string, customerName: string): Promise<SaleDocument[]> {
+        return this.model.find({ 
+            userId,
+            customerName: { $regex: customerName, $options: 'i' } 
+        })
             .sort({ date: -1 })
             .populate('productId')
             .exec();

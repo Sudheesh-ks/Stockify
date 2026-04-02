@@ -11,7 +11,8 @@ export class SaleController implements ISaleController {
     async recordSale(req: Request, res: Response): Promise<void> {
         try {
             const { productId, quantity, customerName } = req.body;
-            const sale = await this._saleService.recordSale(productId, quantity, customerName);
+            const userId = (req as any).userId;
+            const sale = await this._saleService.recordSale(userId, productId, quantity, customerName);
             sendResponse(res, HttpStatus.CREATED, true, HttpResponse.CREATED, sale);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);
@@ -20,6 +21,7 @@ export class SaleController implements ISaleController {
 
     async getSales(req: Request, res: Response): Promise<void> {
         try {
+            const userId = (req as any).userId;
             const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
             const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
             const productId = req.query.productId as string | undefined;
@@ -27,7 +29,7 @@ export class SaleController implements ISaleController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
 
-            const result = await this._saleService.getSales({ startDate, endDate, productId, customerName }, page, limit);
+            const result = await this._saleService.getSales(userId, { startDate, endDate, productId, customerName }, page, limit);
             sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, result);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);
@@ -36,8 +38,9 @@ export class SaleController implements ISaleController {
 
     async getSalesByCustomer(req: Request, res: Response): Promise<void> {
         try {
+            const userId = (req as any).userId;
             const customerName = req.params.name as string;
-            const result = await this._saleService.getSalesByCustomer(customerName);
+            const result = await this._saleService.getSalesByCustomer(userId, customerName);
             sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, result);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);

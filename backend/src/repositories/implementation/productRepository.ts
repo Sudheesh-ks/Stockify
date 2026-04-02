@@ -12,39 +12,44 @@ export class ProductRepository extends BaseRepository<ProductsDocument> implemen
         return createdProduct;
     }
 
-    async updateProduct(id: string, product: Partial<ProductsDocument>): Promise<ProductsDocument> {
-        const updatedProduct = await this.updateById(id, product);
-            if (!updatedProduct) {
-        throw new Error("Product not found");
-    }
+    async updateProduct(id: string, userId: string, product: Partial<ProductsDocument>): Promise<ProductsDocument> {
+        const updatedProduct = await this.findOneAndUpdate({ _id: id, userId }, product, { new: true });
+        if (!updatedProduct) {
+            throw new Error("Product not found or unauthorized");
+        }
         return updatedProduct;
     }
 
-    async deleteProduct(id: string): Promise<ProductsDocument> {
-        const deletedProduct = await this.deleteById(id);
+    async deleteProduct(id: string, userId: string): Promise<ProductsDocument> {
+        const deletedProduct = await this.model.findOneAndDelete({ _id: id, userId }).exec();
         if (!deletedProduct) {
-            throw new Error("Product not found");
+            throw new Error("Product not found or unauthorized");
         }
         return deletedProduct;
     }
 
-    async getProduct(id: string): Promise<ProductsDocument> {
-        const product = await this.findById(id);
+    async getProduct(id: string, userId: string): Promise<ProductsDocument> {
+        const product = await this.findOne({ _id: id, userId });
         if (!product) {
-            throw new Error("Product not found");
+            throw new Error("Product not found or unauthorized");
         }
         return product;
     }
 
-    async getAllProducts(search?: string, page?: number, limit?: number): Promise<{ products: ProductsDocument[], totalCount: number }> {
-        const query = search
-            ? {
-                  $or: [
-                      { name: { $regex: search, $options: "i" } },
-                      { description: { $regex: search, $options: "i" } },
-                  ],
-              }
-            : {};
+    async getAllProducts(userId: string, search?: string, page?: number, limit?: number): Promise<{ products: ProductsDocument[], totalCount: number }> {
+        const query: any = { userId };
+        
+        if (search) {
+            query.$and = [
+                { userId },
+                {
+                    $or: [
+                        { name: { $regex: search, $options: "i" } },
+                        { description: { $regex: search, $options: "i" } },
+                    ],
+                }
+            ];
+        }
         
         const totalCount = await this.countDocuments(query);
         

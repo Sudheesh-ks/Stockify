@@ -11,7 +11,8 @@ export class CustomerController implements ICustomerController {
     async createCustomer(req: Request, res: Response): Promise<void> {
         try {
             const { name, address, mobile } = req.body;
-            const customer = await this._customerService.createCustomer({ name, address, mobile });
+            const userId = (req as any).userId;
+            const customer = await this._customerService.createCustomer(userId, { name, address, mobile });
             sendResponse(res, HttpStatus.CREATED, true, HttpResponse.CUSTOMER_CREATED, customer);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
@@ -22,7 +23,8 @@ export class CustomerController implements ICustomerController {
         try {
             const { name, address, mobile } = req.body;
             const id = req.params.id as string;
-            const customer = await this._customerService.updateCustomer(id, { name, address, mobile });
+            const userId = (req as any).userId;
+            const customer = await this._customerService.updateCustomer(id, userId, { name, address, mobile });
             sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_UPDATED, customer);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
@@ -32,7 +34,8 @@ export class CustomerController implements ICustomerController {
     async deleteCustomer(req: Request, res: Response): Promise<void> {
         try {
             const id = req.params.id as string;
-            const customer = await this._customerService.deleteCustomer(id);
+            const userId = (req as any).userId;
+            const customer = await this._customerService.deleteCustomer(id, userId);
             sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_DELETED, customer);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
@@ -42,7 +45,8 @@ export class CustomerController implements ICustomerController {
     async getCustomer(req: Request, res: Response): Promise<void> {
         try {
             const id = req.params.id as string;
-            const customer = await this._customerService.getCustomer(id);
+            const userId = (req as any).userId;
+            const customer = await this._customerService.getCustomer(id, userId);
             sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_FOUND, customer);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
@@ -52,9 +56,10 @@ export class CustomerController implements ICustomerController {
     async getAllCustomers(req: Request, res: Response): Promise<void> {
         try {
             const search = req.query.search as string | undefined;
+            const userId = (req as any).userId;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 5;
-            const result = await this._customerService.getAllCustomers(search, page, limit);
+            const result = await this._customerService.getAllCustomers(userId, search, page, limit);
             sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMERS_FOUND, result);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);

@@ -1,16 +1,21 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import { ProductsTypes } from "../types/product";
 
-export interface ProductsDocument extends Omit<ProductsTypes, "_id">, Document {
+export interface ProductsDocument extends Omit<ProductsTypes, "_id" | "userId">, Document {
   _id: Types.ObjectId;
+  userId: Types.ObjectId;
 }
 
 const productsSchema: Schema<ProductsDocument> = new Schema<ProductsDocument>(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     description: {
       type: String,
@@ -19,7 +24,7 @@ const productsSchema: Schema<ProductsDocument> = new Schema<ProductsDocument>(
     quantity: {
       type: Number,
       required: true,
-      min: 0
+      min: 0,
     },
     price: {
       type: Number,
@@ -28,7 +33,7 @@ const productsSchema: Schema<ProductsDocument> = new Schema<ProductsDocument>(
     },
   },
   {
-    timestamps: false,
+    timestamps: true,
   }
 );
 
