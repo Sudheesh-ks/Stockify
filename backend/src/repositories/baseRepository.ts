@@ -1,6 +1,6 @@
 import { Model, UpdateQuery, HydratedDocument  } from 'mongoose';
 
-type FilterQuery<T> = any; // Using any to allow complex Mongoose queries like $or, $regex, etc.
+type FilterQuery<T> = Partial<Record<keyof T, any>>;
 
 export class BaseRepository<T> {
   constructor(protected model: Model<T>) {}

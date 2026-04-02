@@ -9,7 +9,7 @@ export const createProductAPI = async (data: ProductTypes) => {
 
 export const getAllProductsAPI = async (search?: string, page?: number, limit?: number) => {
     const res = await userApi.get(PRODUCT_API.GET_ALL, { params: { search, page, limit } })
-    return res.data.data; // Now returns { products, totalCount, totalPages, currentPage }
+    return res.data.data;
 }
 
 export const getProductByIdAPI = async (id: string) => {
