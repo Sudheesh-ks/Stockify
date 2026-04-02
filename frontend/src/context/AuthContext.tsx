@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { loginAPI, registerAPI, verifyOtpAPI } from '../services/authServices';
+import { loginAPI, registerAPI, verifyOtpAPI, refreshTokenAPI } from '../services/authServices';
 import toast from 'react-hot-toast';
 import { showErrorToast } from '../utils/errorHandler';
 
@@ -41,6 +41,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('token'));
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      if (!token) {
+        try {
+          const result = await refreshTokenAPI();
+          if (result && result.accessToken) {
+            setToken(result.accessToken);
+            setUser(result.user);
+            setIsAuthenticated(true);
+          }
+        } catch (err) {
+          console.log("Initial session refresh failed:", err);
+        }
+      }
+    };
+    initAuth();
+  }, []);
 
   useEffect(() => {
     if (token) {

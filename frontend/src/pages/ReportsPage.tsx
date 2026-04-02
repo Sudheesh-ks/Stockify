@@ -103,11 +103,11 @@ const ReportsPage = () => {
     };
 
     // 📑 Columns
-    const salesColumns: Column<SaleTypes>[] = [
-        { header: "Date", accessor: (s) => new Date(s.date).toLocaleDateString() },
+    const salesColumns: Column<any>[] = [
+        { header: "Date", accessor: (s: SaleTypes) => new Date(s.date).toLocaleDateString() },
         { header: "Product", accessor: "productName", className: "font-bold text-white" },
         { header: "Qty", accessor: "quantity", className: "text-emerald-400" },
-        { header: "Total", accessor: (s) => `$${s.totalAmount.toFixed(2)}`, className: "font-bold" },
+        { header: "Total", accessor: (s: SaleTypes) => `$${s.totalAmount.toFixed(2)}`, className: "font-bold" },
         { header: "Customer", accessor: "customerName" },
     ];
 
@@ -181,8 +181,8 @@ const ReportsPage = () => {
                     </div>
                     
                     <DataTable
-                        data={activeTab === "sales" ? sales : activeTab === "items" ? itemsReport : ledgerReport}
-                        columns={activeTab === "sales" ? salesColumns : activeTab === "items" ? itemColumns : ledgerColumns}
+                        data={(activeTab === "sales" ? sales : activeTab === "items" ? itemsReport : ledgerReport) as any[]}
+                        columns={(activeTab === "sales" ? salesColumns : activeTab === "items" ? itemColumns : ledgerColumns) as any[]}
                         isLoading={isLoading}
                         emptyMessage="No data available for this report."
                     />

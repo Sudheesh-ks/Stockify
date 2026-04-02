@@ -100,7 +100,7 @@ async loginUser(req: Request, res: Response): Promise<void> {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
@@ -146,24 +146,37 @@ async logoutUser(req: Request, res: Response): Promise<void> {
 }
 
 
-async refreshToken(req: Request, res: Response): Promise<void> {
-    try {
-        const token = req.cookies.refreshToken;
-        if(!token) {
-            sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.REFRESH_TOKEN_MISSING);
+    async refreshToken(req: Request, res: Response): Promise<void> {
+        console.log("Backend: refreshToken endpoint reached");
+        try {
+            const token = req.cookies.refreshToken;
+            console.log("Backend: Refresh token from cookies:", token ? "Found" : "Missing");
+            
+            if (!token) {
+                sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.REFRESH_TOKEN_MISSING);
+                return;
+            }
+
+            const decoded = verifyRefreshToken(token);
+            console.log("Backend: Token decoded successfully for user ID:", decoded.id);
+            const user = await this._authService.getUserById(decoded.id);
+
+            if (!user) {
+                console.warn("Backend: User not found for decoded ID:", decoded.id);
+                sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_NOT_FOUND);
+                return;
+            }
+
+            const newAccessToken = generateAccessToken(user._id!, user.email);
+            console.log("Backend: New access token generated successfully");
+
+            sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, {
+                accessToken: newAccessToken,
+                user: user,
+            });
+        } catch (error: any) {
+            console.error("Backend: Refresh token failed with error:", error.message);
+            sendResponse(res, HttpStatus.UNAUTHORIZED, false, error.message, null, error);
         }
-
-        const decoded = verifyRefreshToken(token);
-
-        const user = await this._authService.getUserById(decoded.id);
-
-        const newAccessToken = generateAccessToken(user?._id!, user?.email!);
-
-        sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, {
-            accessToken: newAccessToken,
-        })
-    } catch (error) {
-        sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
-}
 }

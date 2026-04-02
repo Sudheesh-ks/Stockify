@@ -1,4 +1,4 @@
-import { userApi } from "../axios/axiosInstance";
+import { userApi, refreshApi } from "../axios/axiosInstance";
 import { AUTH_API, OTP_API } from "../constants/apiConstants";
 
 interface RegisterData {
@@ -21,14 +21,19 @@ export const loginAPI = async (email: string, password: string) => {
 
 export const refreshTokenAPI = async () => {
     try {
-        const res = await userApi.get(AUTH_API.REFRESH_TOKEN, {
-            withCredentials: true,
-        });
-        const accessToken = res.data.data.accessToken;
+        console.log("Calling refresh token API...");
+        const res = await refreshApi.get(AUTH_API.REFRESH_TOKEN);
+        
+        console.log("Refresh token response full data:", res.data);
+        const { accessToken, user } = res.data.data;
         localStorage.setItem("token", accessToken);
-        return accessToken;
-    } catch (error) {
-        console.error("Refresh token error:", error);
+        return { accessToken, user };
+    } catch (error: any) {
+        console.error("Refresh token error:", {
+            message: error.message,
+            status: error.response?.status,
+            data: error.response?.data
+        });
         localStorage.removeItem("token");
         return null;
     }
