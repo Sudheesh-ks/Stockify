@@ -1,7 +1,7 @@
 import { CustomerDTO } from "../../dtos/customer.dto";
 import { toCustomerDTO } from "../../mappers/customer.mapper";
 import { CustomerRepository } from "../../repositories/implementation/customerRepository";
-import { ICustomerService } from "../interface/iCustomerService";
+import { ICustomerService } from "../interface/ICustomerService";
 
 export class CustomerService implements ICustomerService {
     constructor(private readonly _customerRepository: CustomerRepository) {}

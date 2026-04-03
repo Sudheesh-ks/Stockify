@@ -1,7 +1,7 @@
 import { ProductDTO } from "../../dtos/product.dto";
 import { toProductDTO } from "../../mappers/product.mapper";
 import { ProductRepository } from "../../repositories/implementation/productRepository";
-import { IProductService } from "../interface/iProductService";
+import { IProductService } from "../interface/IProductService";
 
 export class ProductService implements IProductService {
     constructor(

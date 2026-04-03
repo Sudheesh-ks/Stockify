@@ -1,9 +1,9 @@
-import { IProductService } from "../../services/interface/iProductService";
+import { IProductService } from "../../services/interface/IProductService";
 import { sendResponse } from "../../utils/apiResponse.util";
 import { HttpStatus } from "../../constants/status.constants";
 import { HttpResponse } from "../../constants/responseMessage.constants";
 import { Request, Response } from "express";
-import { IProductController } from "../interface/iProductController";
+import { IProductController } from "../interface/IProductController";
 
 export class ProductController implements IProductController {
   constructor(private readonly _productService: IProductService) {}

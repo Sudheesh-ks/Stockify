@@ -2,7 +2,7 @@ import { SaleDTO } from "../../dtos/sale.dto";
 import { toSaleDTO } from "../../mappers/sale.mapper";
 import { ProductRepository } from "../../repositories/implementation/productRepository";
 import { SaleRepository } from "../../repositories/implementation/saleRepository";
-import { ISaleService } from "../interface/iSaleService";
+import { ISaleService } from "../interface/ISaleService";
 
 export class SaleService implements ISaleService {
     constructor(

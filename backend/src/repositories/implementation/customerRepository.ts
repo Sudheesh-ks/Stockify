@@ -1,6 +1,6 @@
 import customerModel, { CustomerDocument } from "../../models/customerModel";
 import { BaseRepository } from "../baseRepository";
-import { ICustomerRepository } from "../interface/iCustomerRepository";
+import { ICustomerRepository } from "../interface/ICustomerRepository";
 
 export class CustomerRepository extends BaseRepository<CustomerDocument> implements ICustomerRepository {
     constructor() {

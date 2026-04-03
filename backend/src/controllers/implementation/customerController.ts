@@ -1,9 +1,9 @@
-import { ICustomerService } from "../../services/interface/iCustomerService";
+import { ICustomerService } from "../../services/interface/ICustomerService";
 import { sendResponse } from "../../utils/apiResponse.util";
 import { HttpStatus } from "../../constants/status.constants";
 import { HttpResponse } from "../../constants/responseMessage.constants";
 import { Request, Response } from "express";
-import { ICustomerController } from "../interface/iCustomerController";
+import { ICustomerController } from "../interface/ICustomerController";
 
 export class CustomerController implements ICustomerController {
   constructor(private readonly _customerService: ICustomerService) {}

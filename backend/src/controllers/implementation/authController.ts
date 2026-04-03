@@ -8,7 +8,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../../utils/jwt.util";
-import { IAuthController } from "../interface/iAuthController";
+import { IAuthController } from "../interface/IAuthController";
 import { IAuthService } from "../../services/interface/IAuthService";
 
 export class AuthController implements IAuthController {

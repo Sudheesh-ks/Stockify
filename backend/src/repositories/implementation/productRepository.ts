@@ -1,6 +1,6 @@
 import productsModel, { ProductsDocument } from "../../models/productsModel";
 import { BaseRepository } from "../baseRepository";
-import { IProductRepository } from "../interface/iProductRepository";
+import { IProductRepository } from "../interface/IProductRepository";
 
 export class ProductRepository extends BaseRepository<ProductsDocument> implements IProductRepository {
     constructor() {

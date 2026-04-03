@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import salesModel, { SaleDocument } from "../../models/salesModel";
 import { BaseRepository } from "../baseRepository";
-import { ISaleRepository } from "../interface/iSaleRepository";
+import { ISaleRepository } from "../interface/ISaleRepository";
 
 export class SaleRepository extends BaseRepository<SaleDocument> implements ISaleRepository {
     constructor() {

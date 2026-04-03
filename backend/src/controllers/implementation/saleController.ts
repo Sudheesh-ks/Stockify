@@ -1,9 +1,9 @@
-import { ISaleService } from "../../services/interface/iSaleService";
+import { ISaleService } from "../../services/interface/ISaleService";
 import { sendResponse } from "../../utils/apiResponse.util";
 import { HttpStatus } from "../../constants/status.constants";
 import { HttpResponse } from "../../constants/responseMessage.constants";
 import { Request, Response } from "express";
-import { ISaleController } from "../interface/iSaleController";
+import { ISaleController } from "../interface/ISaleController";
 
 export class SaleController implements ISaleController {
   constructor(private readonly _saleService: ISaleService) {}
