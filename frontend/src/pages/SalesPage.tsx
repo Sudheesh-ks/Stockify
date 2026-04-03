@@ -27,6 +27,7 @@ const SaleSchema = Yup.object().shape({
     productId: Yup.string().required("Product is required"),
     quantity: Yup.number().min(1, "Quantity must be at least 1").required("Required"),
     customerName: Yup.string().optional(),
+    date: Yup.date().required("Date is required"),
 });
 
 const SalesPage = () => {
@@ -229,56 +230,72 @@ const SalesPage = () => {
                     initialValues={{
                         productId: "",
                         quantity: 1,
-                        customerName: "Cash",
+                        customerName: "",
+                        date: new Date().toISOString().split('T')[0],
                     }}
                     validationSchema={SaleSchema}
                     onSubmit={handleSave}
                 >
                     {({ errors, touched, isSubmitting, values, setFieldValue }) => (
                         <Form className="space-y-4">
-                            <SearchableSelect
-                                label="Select Product"
-                                placeholder="Search by product name..."
-                                onSearch={handleProductSearch}
-                                onSelect={(opt) => {
-                                    setFieldValue("productId", opt?.value || "");
-                                    setSelectedProduct(opt?.original || null);
-                                }}
-                                error={errors.productId}
-                                touched={touched.productId}
-                            />
+                                <SearchableSelect
+                                    label="Select Product"
+                                    placeholder="Search by product name..."
+                                    onSearch={handleProductSearch}
+                                    onSelect={(opt) => {
+                                        setFieldValue("productId", opt?.value || "");
+                                        setSelectedProduct(opt?.original || null);
+                                    }}
+                                    error={errors.productId}
+                                    touched={touched.productId}
+                                />
 
-                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">Quantity</label>
+                                    <label className="block text-sm font-medium text-gray-400 mb-1">Sale Date</label>
                                     <Field
-                                        name="quantity"
-                                        type="number"
-                                        className={`w-full bg-[#151b23] border ${errors.quantity && touched.quantity ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                                        name="date"
+                                        type="date"
+                                        className={`w-full bg-[#151b23] border ${errors.date && touched.date ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
                                     />
-                                    <ErrorMessage name="quantity" component="div" className="text-xs text-red-500 mt-1" />
+                                    <ErrorMessage name="date" component="div" className="text-xs text-red-500 mt-1" />
                                 </div>
+<<<<<<< HEAD
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-1">Total Amount (₹)</label>
                                     <div className="w-full bg-[#0d1117] border border-[#1a1f2a] p-2.5 rounded-lg text-emerald-400 font-bold">
                                         {selectedProduct ? (selectedProduct.price * (values.quantity || 0)).toFixed(2) : "0.00"}
+=======
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Quantity</label>
+                                        <Field
+                                            name="quantity"
+                                            type="number"
+                                            className={`w-full bg-[#151b23] border ${errors.quantity && touched.quantity ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                                        />
+                                        <ErrorMessage name="quantity" component="div" className="text-xs text-red-500 mt-1" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-1">Total Amount (₹)</label>
+                                        <div className="w-full bg-[#0d1117] border border-[#1a1f2a] p-2.5 rounded-lg text-emerald-400 font-bold">
+                                            {selectedProduct ? (selectedProduct.price * (values.quantity || 0)).toFixed(2) : "0.00"}
+                                        </div>
+>>>>>>> dev
                                     </div>
                                 </div>
-                            </div>
 
-                            <SearchableSelect
-                                label="Customer / Buyer"
-                                placeholder="Search existing or type name (e.g. Cash)"
-                                defaultValue="Cash"
-                                allowCustom={true}
-                                onSearch={handleCustomerSearch}
-                                onSelect={(opt) => {
-                                    // Use setFieldValue to update customerName correctly
-                                    setFieldValue("customerName", opt?.value || "");
-                                }}
-                                error={errors.customerName}
-                                touched={touched.customerName}
-                            />
+                                <SearchableSelect
+                                    label="Customer Name"
+                                    placeholder="Select existing or type name (Leave blank for 'Cash')"
+                                    allowCustom={true}
+                                    onSearch={handleCustomerSearch}
+                                    onSelect={(opt) => {
+                                        setFieldValue("customerName", opt?.value || "");
+                                    }}
+                                    error={errors.customerName}
+                                    touched={touched.customerName}
+                                />
 
                             <div className="flex gap-3 pt-4">
                                 <button

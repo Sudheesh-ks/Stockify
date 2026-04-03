@@ -10,7 +10,7 @@ export interface SaleFilters {
     limit?: number;
 }
 
-export const createSaleAPI = async (data: { productId: string, quantity: number, customerName?: string }) => {
+export const createSaleAPI = async (data: { productId: string, quantity: number, customerName?: string, date?: string }) => {
     const res = await userApi.post(SALE_API.CREATE, data)
     return res.data.data;
 }

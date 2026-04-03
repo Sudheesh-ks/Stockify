@@ -10,7 +10,7 @@ export class SaleService implements ISaleService {
         private readonly _productRepository: ProductRepository
     ) {}
 
-    async recordSale(userId: string, productId: string, quantity: number, customerName: string = "Cash"): Promise<SaleDTO> {
+    async recordSale(userId: string, productId: string, quantity: number, customerName: string = "Cash", date: Date = new Date()): Promise<SaleDTO> {
         // 1. Fetch product
         const product = await this._productRepository.getProduct(productId, userId);
 
@@ -29,7 +29,7 @@ export class SaleService implements ISaleService {
             price: product.price,
             totalAmount,
             customerName,
-            date: new Date()
+            date: date || new Date()
         });
 
         // 5. Reduce product stock
