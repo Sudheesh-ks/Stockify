@@ -131,7 +131,7 @@ const ProductsPage = () => {
     },
     {
       header: "Price",
-      accessor: (p: ProductTypes) => `$${p.price.toFixed(2)}`,
+      accessor: (p: ProductTypes) => `₹${p.price.toFixed(2)}`,
       className: "text-white font-medium"
     },
   ];
@@ -228,7 +228,7 @@ const ProductsPage = () => {
                   <ErrorMessage name="quantity" component="div" className="text-xs text-red-500 mt-1" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1">Price ($)</label>
+                  <label className="block text-sm font-medium text-gray-400 mb-1">Price (₹)</label>
                   <Field
                     name="price"
                     type="number"

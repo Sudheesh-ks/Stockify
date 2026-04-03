@@ -40,7 +40,6 @@ const Loginpage = () => {
       await tempSchema.validate(tempObject);
       return "";
     } catch (error) {
-      showErrorToast(error);
       return (error as Error).message || "Invalid field";
     }
   };
@@ -96,7 +95,6 @@ const Loginpage = () => {
         });
       }
     } catch (error) {
-      showErrorToast(error);
       // If it's a validation error, update the errors state
       if ((error as { path?: string }).path) {
         const errorPath = (error as { path?: string }).path!;
@@ -104,9 +102,8 @@ const Loginpage = () => {
         setErrors(prev => ({ ...prev, [errorPath]: errorMessage }));
         setTouched(prev => ({ ...prev, [errorPath]: true }));
       } else {
-        // If it's an API error, show error toast
-        console.error(error);
-        showErrorToast(error);
+        // API errors are already handled/toasted in AuthContext
+        console.error("Submission error:", error);
       }
     }
   };

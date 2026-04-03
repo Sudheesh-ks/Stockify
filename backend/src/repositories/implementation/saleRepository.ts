@@ -100,4 +100,8 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
         const data = results[0]?.data || [];
         return { data, totalCount };
     }
+
+    async deleteSale(id: string): Promise<void> {
+        await this.deleteById(id);
+    }
 }

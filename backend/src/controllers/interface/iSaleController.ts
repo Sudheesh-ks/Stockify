@@ -6,4 +6,5 @@ export interface ISaleController {
     getSalesByCustomer(req: Request, res: Response): Promise<void>;
     getItemsReport(req: Request, res: Response): Promise<void>;
     getCustomerLedger(req: Request, res: Response): Promise<void>;
+    deleteSale(req: Request, res: Response): Promise<void>;
 }

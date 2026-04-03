@@ -33,5 +33,6 @@ export const SALE_API = {
     GET_ALL: '/api/sales',
     GET_BY_CUSTOMER: (name: string) => `/api/sales/customer/${name}`,
     GET_ITEMS_REPORT: '/api/sales/reports/items',
-    GET_LEDGER_REPORT: '/api/sales/reports/ledger'
+    GET_LEDGER_REPORT: '/api/sales/reports/ledger',
+    DELETE: (id: string) => `/api/sales/${id}`
 }

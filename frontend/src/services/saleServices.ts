@@ -34,3 +34,8 @@ export const getCustomerLedgerAPI = async (page: number = 1, limit: number = 10)
     const res = await userApi.get(SALE_API.GET_LEDGER_REPORT, { params: { page, limit } })
     return res.data.data;
 }
+
+export const deleteSaleAPI = async (id: string) => {
+    const res = await userApi.delete(SALE_API.DELETE(id))
+    return res.data.data;
+}

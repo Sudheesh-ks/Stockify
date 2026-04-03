@@ -72,8 +72,8 @@ const ReportsPage = () => {
                     "Date": new Date(s.date).toLocaleDateString(),
                     "Product": s.productName,
                     "Quantity": s.quantity,
-                    "Price": `$${s.price.toFixed(2)}`,
-                    "Total Amount": `$${s.totalAmount.toFixed(2)}`,
+                    "Price": `₹${s.price.toFixed(2)}`,
+                    "Total Amount": `₹${s.totalAmount.toFixed(2)}`,
                     "Customer": s.customerName
                 }));
             } else if (activeTab === "items") {
@@ -90,7 +90,7 @@ const ReportsPage = () => {
                 excelData = fullData.map(l => ({
                     "Customer Name": l.name,
                     "Transactions": l.transactions,
-                    "Total Spent": `$${l.totalSpent.toFixed(2)}`
+                    "Total Spent": `₹${l.totalSpent.toFixed(2)}`
                 }));
             }
 
@@ -116,7 +116,7 @@ const ReportsPage = () => {
                 const res = await getAllSalesAPI({ limit: 5000 });
                 fullData = res.sales;
                 headers = ["Date", "Product", "Qty", "Total", "Customer"];
-                body = fullData.map(s => [new Date(s.date).toLocaleDateString(), s.productName, s.quantity, `$${s.totalAmount}`, s.customerName]);
+                body = fullData.map(s => [new Date(s.date).toLocaleDateString(), s.productName, s.quantity, `₹${s.totalAmount}`, s.customerName]);
             } else if (activeTab === "items") {
                 const res = await getItemsReportAPI(1, 5000);
                 fullData = res.data;
@@ -126,7 +126,7 @@ const ReportsPage = () => {
                 const res = await getCustomerLedgerAPI(1, 5000);
                 fullData = res.data;
                 headers = ["Customer Name", "Transactions", "Total Spent"];
-                body = fullData.map(l => [l.name, l.transactions, `$${l.totalSpent.toFixed(2)}`]);
+                body = fullData.map(l => [l.name, l.transactions, `₹${l.totalSpent.toFixed(2)}`]);
             }
 
             autoTable(doc, {
@@ -145,7 +145,7 @@ const ReportsPage = () => {
         { header: "Date", accessor: (s: SaleTypes) => new Date(s.date).toLocaleDateString() },
         { header: "Product", accessor: "productName", className: "font-bold text-white" },
         { header: "Qty", accessor: "quantity", className: "text-emerald-400" },
-        { header: "Total", accessor: (s: SaleTypes) => `$${s.totalAmount.toFixed(2)}`, className: "font-bold" },
+        { header: "Total", accessor: (s: SaleTypes) => `₹${s.totalAmount.toFixed(2)}`, className: "font-bold" },
         { header: "Customer", accessor: "customerName" },
     ];
 
@@ -158,7 +158,7 @@ const ReportsPage = () => {
     const ledgerColumns: Column<any>[] = [
         { header: "Customer Name", accessor: "name", className: "font-bold text-white" },
         { header: "Transactions", accessor: "transactions" },
-        { header: "Total Spent", accessor: (l) => `$${l.totalSpent.toFixed(2)}`, className: "text-emerald-400 font-bold" },
+        { header: "Total Spent", accessor: (l) => `₹${l.totalSpent.toFixed(2)}`, className: "text-emerald-400 font-bold" },
     ];
 
     return (

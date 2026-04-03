@@ -87,4 +87,28 @@ export class SaleService implements ISaleService {
         const totalPages = Math.ceil(totalCount / limit);
         return { data, totalCount, totalPages, currentPage: page };
     }
+
+    async deleteSale(userId: any, id: string): Promise<void> {
+        const currentUserId = userId.toString();
+
+        // 1. Fetch sale (Verify ownership in the query itself)
+        const sale = await this._saleRepository.findOne({ _id: id, userId: userId as any });
+        
+        if (!sale) {
+            console.error(`Sale deletion failed: Sale not found or unauthorized. ID: ${id}, userId: ${currentUserId}`);
+            throw new Error("Sale not found or unauthorized");
+        }
+
+        // 2. Fetch product
+        const productId = sale.productId.toString();
+        const product = await this._productRepository.getProduct(productId, currentUserId);
+
+        // 3. Restore stock
+        await this._productRepository.updateProduct(productId, currentUserId, {
+            quantity: (product.quantity || 0) + (sale.quantity || 0)
+        } as any);
+
+        // 4. Delete the sale record
+        await this._saleRepository.deleteSale(id);
+    }
 }

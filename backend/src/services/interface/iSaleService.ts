@@ -6,4 +6,5 @@ export interface ISaleService {
     getSalesByCustomer(userId: string, customerName: string): Promise<SaleDTO[]>;
     getItemsReport(userId: string, page: number, limit: number): Promise<{ data: any[], totalCount: number, totalPages: number, currentPage: number }>;
     getCustomerLedger(userId: string, page: number, limit: number): Promise<{ data: any[], totalCount: number, totalPages: number, currentPage: number }>;
+    deleteSale(userId: string, id: string): Promise<void>;
 }

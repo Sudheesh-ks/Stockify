@@ -13,11 +13,12 @@ import DataTable from "../components/DataTable";
 import type { Column } from "../components/DataTable";
 import Pagination from "../components/Pagination";
 import AddEditModal from "../components/AddEditModal";
+import ConfirmationModal from "../components/ConfirmationModal";
 import SearchableSelect from "../components/SearchableSelect";
 import type { SaleTypes } from "../types/sale";
 import type { ProductTypes } from "../types/product";
 import { getAllProductsAPI } from "../services/productServices";
-import { createSaleAPI, getAllSalesAPI } from "../services/saleServices";
+import { createSaleAPI, deleteSaleAPI, getAllSalesAPI } from "../services/saleServices";
 import { showErrorToast } from "../utils/errorHandler";
 
 const ITEMS_PER_PAGE = 1;
@@ -36,13 +37,28 @@ const SalesPage = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Confirmation State
+    const [confirmConfig, setConfirmConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        action: () => void;
+        type: "danger" | "warning";
+    }>({
+        isOpen: false,
+        title: "",
+        message: "",
+        action: () => { },
+        type: "warning",
+    });
+
     const handleProductSearch = async (query: string) => {
         try {
             const data = await getAllProductsAPI(query, 1, 10);
             return data.products.map((p: ProductTypes) => ({
                 value: p._id,
                 label: p.name,
-                subLabel: `Stock: ${p.quantity} | Price: $${p.price}`,
+                subLabel: `Stock: ${p.quantity} | Price: ₹${p.price}`,
                 original: p
             }));
         } catch (error) {
@@ -103,6 +119,26 @@ const SalesPage = () => {
         }
     };
 
+    const handleDelete = (id: string) => {
+        const saleToDelete = sales.find((s) => s._id === id);
+        setConfirmConfig({
+            isOpen: true,
+            title: "Delete Sale Record",
+            message: `Are you sure you want to delete the sale of "${saleToDelete?.productName}"? This will restore ${saleToDelete?.quantity} units back to stock.`,
+            type: "danger",
+            action: async () => {
+                try {
+                    await deleteSaleAPI(id);
+                    toast.success("Sale deleted and stock restored!");
+                    fetchSales();
+                    setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+                } catch (error) {
+                    showErrorToast(error);
+                }
+            },
+        });
+    };
+
     const columns: Column<SaleTypes>[] = [
         { 
             header: "Date", 
@@ -122,12 +158,12 @@ const SalesPage = () => {
         },
         { 
             header: "Unit Price", 
-            accessor: (s: SaleTypes) => `$${s.price.toFixed(2)}`,
+            accessor: (s: SaleTypes) => `₹${s.price.toFixed(2)}`,
             className: "text-gray-300"
         },
         { 
             header: "Total", 
-            accessor: (s: SaleTypes) => `$${s.totalAmount.toFixed(2)}`,
+            accessor: (s: SaleTypes) => `₹${s.totalAmount.toFixed(2)}`,
             className: "text-white font-bold"
         },
         { 
@@ -171,6 +207,7 @@ const SalesPage = () => {
                     <DataTable
                         data={sales}
                         columns={columns}
+                        onDelete={handleDelete}
                         emptyMessage="No sales recorded yet."
                     />
 
@@ -222,7 +259,7 @@ const SalesPage = () => {
                                     <ErrorMessage name="quantity" component="div" className="text-xs text-red-500 mt-1" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-400 mb-1">Total Amount ($)</label>
+                                    <label className="block text-sm font-medium text-gray-400 mb-1">Total Amount (₹)</label>
                                     <div className="w-full bg-[#0d1117] border border-[#1a1f2a] p-2.5 rounded-lg text-emerald-400 font-bold">
                                         {selectedProduct ? (selectedProduct.price * (values.quantity || 0)).toFixed(2) : "0.00"}
                                     </div>
@@ -263,6 +300,16 @@ const SalesPage = () => {
                     )}
                 </Formik>
             </AddEditModal>
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmConfig.isOpen}
+                title={confirmConfig.title}
+                message={confirmConfig.message}
+                type={confirmConfig.type}
+                onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+                onConfirm={confirmConfig.action}
+            />
         </DashboardLayout>
     );
 };

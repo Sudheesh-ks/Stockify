@@ -1,4 +1,4 @@
-import { DollarSign, Package, Users, ArrowRight, Store, UserCircle } from "lucide-react";
+import { IndianRupee, Package, Users, ArrowRight, Store, UserCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useAuth } from "../hooks/useAuth";
@@ -83,9 +83,9 @@ const Dashboard = () => {
         isLoading: false
       });
 
-      setRecentProducts(prodData.products.map((p: any) => [p.name, p.quantity, `$${p.price}`]));
+      setRecentProducts(prodData.products.map((p: any) => [p.name, p.quantity, `₹${p.price}`]));
       setRecentCustomers(custData.customers.map((c: any) => [c.name, c.phone]));
-      setRecentSales(saleData.sales.map((s: any) => [s.productName, s.customerName || "Cash", s.quantity, `$${s.totalAmount}`]));
+      setRecentSales(saleData.sales.map((s: any) => [s.productName, s.customerName || "Cash", s.quantity, `₹${s.totalAmount}`]));
 
     } catch (error) {
       showErrorToast(error);
@@ -148,7 +148,7 @@ const Dashboard = () => {
           <StatCard 
             title="Total Sales" 
             value={stats.sales} 
-            Icon={DollarSign} 
+            Icon={IndianRupee} 
             link="/sales"
           />
         </div>

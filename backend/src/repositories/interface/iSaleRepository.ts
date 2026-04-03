@@ -6,4 +6,5 @@ export interface ISaleRepository {
     getSalesByCustomer(userId: string, customerName: string): Promise<SaleDocument[]>;
     getItemsReport(userId: string, page: number, limit: number): Promise<{ data: any[], totalCount: number }>;
     getCustomerLedger(userId: string, page: number, limit: number): Promise<{ data: any[], totalCount: number }>;
+    deleteSale(id: string): Promise<void>;
 }

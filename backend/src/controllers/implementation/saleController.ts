@@ -70,4 +70,15 @@ export class SaleController implements ISaleController {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);
         }
     }
+
+    async deleteSale(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = (req as any).userId;
+            const id = req.params.id as string;
+            await this._saleService.deleteSale(userId, id);
+            sendResponse(res, HttpStatus.OK, true, "Sale deleted successfully", null);
+        } catch (error) {
+            sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);
+        }
+    }
 }
