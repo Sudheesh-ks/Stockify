@@ -18,7 +18,7 @@ import type { CustomerTypes } from "../types/customer";
 import { createCustomerAPI, deleteCustomerAPI, getAllCustomersAPI, updateCustomerAPI } from "../services/customerServices";
 import { showErrorToast } from "../utils/errorHandler";
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 6;
 
 const CustomerSchema = Yup.object().shape({
   name: Yup.string().min(2, "Too short!").required("Required"),

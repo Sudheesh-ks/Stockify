@@ -78,8 +78,8 @@ const OTPVerification = () => {
         return;
       }
 
-    } catch (err: unknown) {
-      // showErrorToast is handled in verifyOtp context
+    } catch (err) {
+      console.error(err);
     }
   };
 

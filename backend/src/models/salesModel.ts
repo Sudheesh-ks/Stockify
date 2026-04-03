@@ -38,7 +38,7 @@ const saleSchema: Schema<SaleDocument> = new Schema<SaleDocument>(
           required: true,
           min: 0,
         },
-      }
+      },
     ],
     totalAmount: {
       type: Number,
@@ -56,7 +56,7 @@ const saleSchema: Schema<SaleDocument> = new Schema<SaleDocument>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const salesModel = mongoose.model<SaleDocument>("sales", saleSchema);

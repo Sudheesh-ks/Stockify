@@ -18,7 +18,7 @@ import type { ProductTypes } from "../types/product";
 import { createProductAPI, deleteProductAPI, getAllProductsAPI, updateProductAPI } from "../services/productServices";
 import { showErrorToast } from "../utils/errorHandler";
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 6;
 
 const ProductSchema = Yup.object().shape({
   name: Yup.string().min(2, "Too short!").required("Required"),

@@ -35,12 +35,12 @@ const otpSchema: Schema<OtpDocument> = new Schema<OtpDocument>(
   },
   {
     timestamps: false,
-  }
+  },
 );
 
 const otpModel: Model<OtpDocument> = mongoose.model<OtpDocument>(
   "otp",
-  otpSchema
+  otpSchema,
 );
 
 export default otpModel;

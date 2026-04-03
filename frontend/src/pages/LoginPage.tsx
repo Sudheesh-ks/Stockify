@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { LayoutGrid, Mail, Lock, User, Building } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { showErrorToast } from "../utils/errorHandler";
 import { useAuth } from "../hooks/useAuth";
 import { validationSchema } from "../utils/validationSchema";
 import * as Yup from "yup";
@@ -95,14 +94,12 @@ const Loginpage = () => {
         });
       }
     } catch (error) {
-      // If it's a validation error, update the errors state
       if ((error as { path?: string }).path) {
         const errorPath = (error as { path?: string }).path!;
         const errorMessage = (error as { message?: string }).message || "Invalid field";
         setErrors(prev => ({ ...prev, [errorPath]: errorMessage }));
         setTouched(prev => ({ ...prev, [errorPath]: true }));
       } else {
-        // API errors are already handled/toasted in AuthContext
         console.error("Submission error:", error);
       }
     }

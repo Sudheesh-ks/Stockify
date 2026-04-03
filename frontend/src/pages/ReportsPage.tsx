@@ -14,18 +14,19 @@ import type { SaleTypes } from "../types/sale";
 import { showErrorToast } from "../utils/errorHandler";
 import { useEffect, useState } from "react";
 import Pagination from "../components/Pagination";
+import type { ItemReport, LedgerReport } from "../types/report";
 
 const ReportsPage = () => {
     const [sales, setSales] = useState<SaleTypes[]>([]);
-    const [itemsReport, setItemsReport] = useState<any[]>([]);
-    const [ledgerReport, setLedgerReport] = useState<any[]>([]);
+    const [itemsReport, setItemsReport] = useState<ItemReport[]>([]);
+    const [ledgerReport, setLedgerReport] = useState<LedgerReport[]>([]);
     const [activeTab, setActiveTab] = useState<"sales" | "items" | "ledger">("sales");
     const [isLoading, setIsLoading] = useState(true);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const ITEMS_PER_PAGE = 1;
+    const ITEMS_PER_PAGE = 10;
 
     const fetchData = async () => {
         try {
@@ -166,13 +167,13 @@ const ReportsPage = () => {
         { header: "Customer", accessor: "customerName" },
     ];
 
-    const itemColumns: Column<any>[] = [
+    const itemColumns: Column<ItemReport>[] = [
         { header: "Product Name", accessor: "name", className: "font-bold text-white" },
         { header: "Current Stock", accessor: "stock", className: "text-amber-400" },
         { header: "Total Sold", accessor: "sold", className: "text-emerald-400" },
     ];
 
-    const ledgerColumns: Column<any>[] = [
+    const ledgerColumns: Column<LedgerReport>[] = [
         { header: "Customer Name", accessor: "name", className: "font-bold text-white" },
         { header: "Transactions", accessor: "transactions" },
         { header: "Total Spent", accessor: (l) => `₹${l.totalSpent.toFixed(2)}`, className: "text-emerald-400 font-bold" },

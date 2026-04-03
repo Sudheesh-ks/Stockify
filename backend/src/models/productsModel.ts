@@ -1,7 +1,8 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import { ProductsTypes } from "../types/product";
 
-export interface ProductsDocument extends Omit<ProductsTypes, "_id" | "userId">, Document {
+export interface ProductsDocument
+  extends Omit<ProductsTypes, "_id" | "userId">, Document {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
 }
@@ -34,12 +35,12 @@ const productsSchema: Schema<ProductsDocument> = new Schema<ProductsDocument>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const productsModel: Model<ProductsDocument> = mongoose.model<ProductsDocument>(
   "products",
-  productsSchema
+  productsSchema,
 );
 
 export default productsModel;

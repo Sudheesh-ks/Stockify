@@ -12,3 +12,15 @@ export interface SaleTypes {
     customerName: string;
     date: string | Date;
 }
+
+
+export type SaleFormValues = {
+  items: {
+    productId: string;
+    quantity: number;
+    price: number;
+    _tempName: string;
+  }[];
+  customerName: string;
+  date: string;
+};
