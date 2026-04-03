@@ -38,4 +38,9 @@ authRouter.get(
     authController.refreshToken.bind(authController)
 );
 
+authRouter.post(
+    '/logout',
+    authController.logoutUser.bind(authController)
+)
+
 export default authRouter;

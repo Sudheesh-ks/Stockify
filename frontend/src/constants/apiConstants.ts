@@ -3,7 +3,8 @@ export const AUTH_API = {
     LOGIN: '/api/login',
     REFRESH_TOKEN: '/api/refresh-token',
     FORGOT_PASSWORD: '/api/forgot-password',
-    RESET_PASSWORD: '/api/reset-password'
+    RESET_PASSWORD: '/api/reset-password',
+    LOGOUT: '/api/logout'
 }
 
 export const OTP_API = {

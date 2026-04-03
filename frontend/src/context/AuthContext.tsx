@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { loginAPI, registerAPI, verifyOtpAPI, refreshTokenAPI } from '../services/authServices';
+import { loginAPI, registerAPI, verifyOtpAPI, refreshTokenAPI, logoutAPI } from '../services/authServices';
 import toast from 'react-hot-toast';
 import { showErrorToast } from '../utils/errorHandler';
 
@@ -158,13 +158,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
-    setIsAuthenticated(false);
+  const logout = async () => {
+    setLoading(true);
     setError(null);
-    toast.success('Logged out successfully');
+    try {
+      const res = await logoutAPI();
+      if (!res.success) {
+        throw new Error(res.message || 'Logout failed');
+      }
+      localStorage.removeItem('token');
+      setToken(null);
+      setUser(null);
+      setIsAuthenticated(false);
+      setError(null);
+      toast.success('Logged out successfully');
+    } catch (error) {
+      showErrorToast(error);
+      setError('Logout failed');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

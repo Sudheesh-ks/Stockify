@@ -2,10 +2,10 @@ import { userApi, refreshApi } from "../axios/axiosInstance";
 import { AUTH_API, OTP_API } from "../constants/apiConstants";
 
 interface RegisterData {
-  email: string;
-  username: string;
-  shopname: string;
-  password: string;
+    email: string;
+    username: string;
+    shopname: string;
+    password: string;
 }
 
 export const registerAPI = async (data: RegisterData) => {
@@ -22,7 +22,7 @@ export const loginAPI = async (email: string, password: string) => {
 export const refreshTokenAPI = async () => {
     try {
         const res = await refreshApi.get(AUTH_API.REFRESH_TOKEN);
-        
+
         const { accessToken, user } = res.data.data;
         localStorage.setItem("token", accessToken);
         return { accessToken, user };
@@ -54,5 +54,10 @@ export const forgotPasswordAPI = async (email: string) => {
 
 export const resetPasswordAPI = async (email: string, newPassword: string) => {
     const res = await userApi.post(AUTH_API.RESET_PASSWORD, { email, newPassword });
+    return res.data;
+}
+
+export const logoutAPI = async () => {
+    const res = await userApi.post(AUTH_API.LOGOUT);
     return res.data;
 }
