@@ -63,18 +63,38 @@ const ReportsPage = () => {
     const exportToExcel = async () => {
         try {
             let fullData: any[] = [];
+            let excelData: any[] = [];
+
             if (activeTab === "sales") {
                 const res = await getAllSalesAPI({ limit: 5000 });
                 fullData = res.sales;
+                excelData = fullData.map(s => ({
+                    "Date": new Date(s.date).toLocaleDateString(),
+                    "Product": s.productName,
+                    "Quantity": s.quantity,
+                    "Price": `$${s.price.toFixed(2)}`,
+                    "Total Amount": `$${s.totalAmount.toFixed(2)}`,
+                    "Customer": s.customerName
+                }));
             } else if (activeTab === "items") {
                 const res = await getItemsReportAPI(1, 5000);
                 fullData = res.data;
+                excelData = fullData.map(i => ({
+                    "Product Name": i.name,
+                    "Current Stock": i.stock,
+                    "Total Sold": i.sold
+                }));
             } else {
                 const res = await getCustomerLedgerAPI(1, 5000);
                 fullData = res.data;
+                excelData = fullData.map(l => ({
+                    "Customer Name": l.name,
+                    "Transactions": l.transactions,
+                    "Total Spent": `$${l.totalSpent.toFixed(2)}`
+                }));
             }
 
-            const ws = XLSX.utils.json_to_sheet(fullData);
+            const ws = XLSX.utils.json_to_sheet(excelData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, activeTab.toUpperCase());
             XLSX.writeFile(wb, `Stockify_${activeTab}_report.xlsx`);
