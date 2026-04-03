@@ -71,9 +71,9 @@ const Dashboard = () => {
   const fetchStats = async () => {
     try {
       const [prodData, custData, saleData] = await Promise.all([
-        getAllProductsAPI("", 1, 5),
-        getAllCustomersAPI("", 1, 5),
-        getAllSalesAPI({ limit: 5 })
+        getAllProductsAPI("", 1, 3),
+        getAllCustomersAPI("", 1, 3),
+        getAllSalesAPI({ limit: 3 })
       ]);
 
       setStats({
