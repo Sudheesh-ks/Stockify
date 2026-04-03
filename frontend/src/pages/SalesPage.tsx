@@ -307,7 +307,7 @@ const SalesPage = () => {
                 <FieldArray name="items">
                   {({ remove }) => (
                     <div className="space-y-3">
-                      {values.items.map((item, index) => (
+                      {values.items.map((_,index) => (
                         <div
                           key={index}
                           className="group relative flex flex-col gap-3 p-4 bg-[#0d1117]/50 rounded-xl border border-[#1a1f2a] hover:border-emerald-500/30 transition-all"

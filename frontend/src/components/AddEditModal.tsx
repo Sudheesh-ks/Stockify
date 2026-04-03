@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Save } from "lucide-react";
+import { X } from "lucide-react";
 
 interface AddEditModalProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface AddEditModalProps {
   isSubmitting?: boolean;
 }
 
-const AddEditModal = ({ isOpen, onClose, title, children, onSubmit, isSubmitting }: AddEditModalProps) => {
+const AddEditModal = ({ isOpen, onClose, title, children }: AddEditModalProps) => {
   if (!isOpen) return null;
 
   return (
