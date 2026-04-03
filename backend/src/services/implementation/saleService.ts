@@ -75,4 +75,16 @@ export class SaleService implements ISaleService {
         const sales = await this._saleRepository.getSalesByCustomer(userId, customerName);
         return sales.map(toSaleDTO);
     }
+
+    async getItemsReport(userId: string, page: number = 1, limit: number = 10): Promise<{ data: any[], totalCount: number, totalPages: number, currentPage: number }> {
+        const { data, totalCount } = await this._saleRepository.getItemsReport(userId, page, limit);
+        const totalPages = Math.ceil(totalCount / limit);
+        return { data, totalCount, totalPages, currentPage: page };
+    }
+
+    async getCustomerLedger(userId: string, page: number = 1, limit: number = 10): Promise<{ data: any[], totalCount: number, totalPages: number, currentPage: number }> {
+        const { data, totalCount } = await this._saleRepository.getCustomerLedger(userId, page, limit);
+        const totalPages = Math.ceil(totalCount / limit);
+        return { data, totalCount, totalPages, currentPage: page };
+    }
 }

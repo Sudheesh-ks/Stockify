@@ -24,3 +24,13 @@ export const getSalesByCustomerAPI = async (name: string) => {
     const res = await userApi.get(SALE_API.GET_BY_CUSTOMER(name))
     return res.data.data;
 }
+
+export const getItemsReportAPI = async (page: number = 1, limit: number = 10) => {
+    const res = await userApi.get(SALE_API.GET_ITEMS_REPORT, { params: { page, limit } })
+    return res.data.data;
+}
+
+export const getCustomerLedgerAPI = async (page: number = 1, limit: number = 10) => {
+    const res = await userApi.get(SALE_API.GET_LEDGER_REPORT, { params: { page, limit } })
+    return res.data.data;
+}

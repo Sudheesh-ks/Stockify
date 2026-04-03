@@ -9,28 +9,40 @@ import DashboardLayout from "../layout/DashboardLayout";
 // Components
 import DataTable from "../components/DataTable";
 import type { Column } from "../components/DataTable";
-import { getAllSalesAPI } from "../services/saleServices";
-import { getAllProductsAPI } from "../services/productServices";
+import { getAllSalesAPI, getItemsReportAPI, getCustomerLedgerAPI } from "../services/saleServices";
 import type { SaleTypes } from "../types/sale";
-import type { ProductTypes } from "../types/product";
 import { showErrorToast } from "../utils/errorHandler";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import Pagination from "../components/Pagination";
 
 const ReportsPage = () => {
     const [sales, setSales] = useState<SaleTypes[]>([]);
-    const [products, setProducts] = useState<ProductTypes[]>([]);
+    const [itemsReport, setItemsReport] = useState<any[]>([]);
+    const [ledgerReport, setLedgerReport] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<"sales" | "items" | "ledger">("sales");
     const [isLoading, setIsLoading] = useState(true);
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const ITEMS_PER_PAGE = 1;
 
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const [salesData, prodData] = await Promise.all([
-                getAllSalesAPI({ limit: 1000 }), // Get many for reports
-                getAllProductsAPI("", 1, 100)
-            ]);
-            setSales(salesData.sales || []);
-            setProducts(prodData.products || []);
+            if (activeTab === "sales") {
+                const data = await getAllSalesAPI({ page: currentPage, limit: ITEMS_PER_PAGE });
+                setSales(data.sales || []);
+                setTotalPages(data.totalPages || 1);
+            } else if (activeTab === "items") {
+                const data = await getItemsReportAPI(currentPage, ITEMS_PER_PAGE);
+                setItemsReport(data.data || []);
+                setTotalPages(data.totalPages || 1);
+            } else {
+                const data = await getCustomerLedgerAPI(currentPage, ITEMS_PER_PAGE);
+                setLedgerReport(data.data || []);
+                setTotalPages(data.totalPages || 1);
+            }
         } catch (error) {
             showErrorToast(error);
         } finally {
@@ -40,66 +52,72 @@ const ReportsPage = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [activeTab, currentPage]);
 
-    // 📊 Aggregations
-    const itemsReport = useMemo(() => {
-        return products.map(p => {
-            const sold = sales
-                .filter(s => s.productId === p._id)
-                .reduce((sum, s) => sum + s.quantity, 0);
-            return {
-                name: p.name,
-                stock: p.quantity,
-                sold: sold
-            };
-        });
-    }, [products, sales]);
-
-    const ledgerReport = useMemo(() => {
-        const groups: Record<string, { name: string, transactions: number, totalSpent: number }> = {};
-        sales.forEach(s => {
-            const name = s.customerName || "Cash";
-            if (!groups[name]) groups[name] = { name, transactions: 0, totalSpent: 0 };
-            groups[name].transactions += 1;
-            groups[name].totalSpent += s.totalAmount;
-        });
-        return Object.values(groups).sort((a, b) => b.totalSpent - a.totalSpent);
-    }, [sales]);
-
-    // 📤 Export Functions
-    const exportToExcel = () => {
-        const data = activeTab === "sales" ? sales : activeTab === "items" ? itemsReport : ledgerReport;
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, activeTab.toUpperCase());
-        XLSX.writeFile(wb, `Stockify_${activeTab}_report.xlsx`);
+    const handleTabChange = (tab: "sales" | "items" | "ledger") => {
+        setActiveTab(tab);
+        setCurrentPage(1); // Reset to first page when tab changes
     };
 
-    const exportToPDF = () => {
-        const doc = new jsPDF();
-        doc.text(`Stockify - ${activeTab.toUpperCase()} REPORT`, 14, 15);
-        
-        let headers: string[] = [];
-        let body: any[] = [];
+    // 📤 Export Functions (Fetch all data for export)
+    const exportToExcel = async () => {
+        try {
+            let fullData: any[] = [];
+            if (activeTab === "sales") {
+                const res = await getAllSalesAPI({ limit: 5000 });
+                fullData = res.sales;
+            } else if (activeTab === "items") {
+                const res = await getItemsReportAPI(1, 5000);
+                fullData = res.data;
+            } else {
+                const res = await getCustomerLedgerAPI(1, 5000);
+                fullData = res.data;
+            }
 
-        if (activeTab === "sales") {
-            headers = ["Date", "Product", "Qty", "Total", "Customer"];
-            body = sales.map(s => [new Date(s.date).toLocaleDateString(), s.productName, s.quantity, `$${s.totalAmount}`, s.customerName]);
-        } else if (activeTab === "items") {
-            headers = ["Product Name", "Current Stock", "Total Sold"];
-            body = itemsReport.map(i => [i.name, i.stock, i.sold]);
-        } else {
-            headers = ["Customer Name", "Transactions", "Total Spent"];
-            body = ledgerReport.map(l => [l.name, l.transactions, `$${l.totalSpent.toFixed(2)}`]);
+            const ws = XLSX.utils.json_to_sheet(fullData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, activeTab.toUpperCase());
+            XLSX.writeFile(wb, `Stockify_${activeTab}_report.xlsx`);
+        } catch (error) {
+            showErrorToast(error);
         }
+    };
 
-        autoTable(doc, {
-            head: [headers],
-            body: body,
-            startY: 25,
-        });
-        doc.save(`Stockify_${activeTab}_report.pdf`);
+    const exportToPDF = async () => {
+        try {
+            const doc = new jsPDF();
+            doc.text(`Stockify - ${activeTab.toUpperCase()} REPORT`, 14, 15);
+            
+            let headers: string[] = [];
+            let body: any[] = [];
+            let fullData: any[] = [];
+
+            if (activeTab === "sales") {
+                const res = await getAllSalesAPI({ limit: 5000 });
+                fullData = res.sales;
+                headers = ["Date", "Product", "Qty", "Total", "Customer"];
+                body = fullData.map(s => [new Date(s.date).toLocaleDateString(), s.productName, s.quantity, `$${s.totalAmount}`, s.customerName]);
+            } else if (activeTab === "items") {
+                const res = await getItemsReportAPI(1, 5000);
+                fullData = res.data;
+                headers = ["Product Name", "Current Stock", "Total Sold"];
+                body = fullData.map(i => [i.name, i.stock, i.sold]);
+            } else {
+                const res = await getCustomerLedgerAPI(1, 5000);
+                fullData = res.data;
+                headers = ["Customer Name", "Transactions", "Total Spent"];
+                body = fullData.map(l => [l.name, l.transactions, `$${l.totalSpent.toFixed(2)}`]);
+            }
+
+            autoTable(doc, {
+                head: [headers],
+                body: body,
+                startY: 25,
+            });
+            doc.save(`Stockify_${activeTab}_report.pdf`);
+        } catch (error) {
+            showErrorToast(error);
+        }
     };
 
     // 📑 Columns
@@ -150,21 +168,21 @@ const ReportsPage = () => {
                 {/* Tabs */}
                 <div className="flex gap-1 bg-[#0d1117] p-1 rounded-xl border border-[#1a1f2a] w-fit non-printable">
                     <button 
-                        onClick={() => setActiveTab("sales")}
+                        onClick={() => handleTabChange("sales")}
                         className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "sales" ? "bg-emerald-500 text-[#05070d]" : "text-gray-400 hover:text-white"}`}
                     >
                         <ShoppingCart className="w-4 h-4" />
                         Sales Report
                     </button>
                     <button 
-                        onClick={() => setActiveTab("items")}
+                        onClick={() => handleTabChange("items")}
                         className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "items" ? "bg-emerald-500 text-[#05070d]" : "text-gray-400 hover:text-white"}`}
                     >
                         <Package className="w-4 h-4" />
                         Items Report
                     </button>
                     <button 
-                        onClick={() => setActiveTab("ledger")}
+                        onClick={() => handleTabChange("ledger")}
                         className={`flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === "ledger" ? "bg-emerald-500 text-[#05070d]" : "text-gray-400 hover:text-white"}`}
                     >
                         <Users className="w-4 h-4" />
@@ -185,6 +203,12 @@ const ReportsPage = () => {
                         columns={(activeTab === "sales" ? salesColumns : activeTab === "items" ? itemColumns : ledgerColumns) as any[]}
                         isLoading={isLoading}
                         emptyMessage="No data available for this report."
+                    />
+
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
                     />
                 </div>
             </div>

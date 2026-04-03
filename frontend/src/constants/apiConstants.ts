@@ -30,5 +30,7 @@ export const CUSTOMER_API = {
 export const SALE_API = {
     CREATE: '/api/sales',
     GET_ALL: '/api/sales',
-    GET_BY_CUSTOMER: (name: string) => `/api/sales/customer/${name}`
+    GET_BY_CUSTOMER: (name: string) => `/api/sales/customer/${name}`,
+    GET_ITEMS_REPORT: '/api/sales/reports/items',
+    GET_LEDGER_REPORT: '/api/sales/reports/ledger'
 }

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import salesModel, { SaleDocument } from "../../models/salesModel";
 import { BaseRepository } from "../baseRepository";
 import { ISaleRepository } from "../interface/iSaleRepository";
@@ -33,5 +34,70 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
             .sort({ date: -1 })
             .populate('productId')
             .exec();
+    }
+    
+    async getItemsReport(userId: string, page: number = 1, limit: number = 10): Promise<{ data: any[], totalCount: number }> {
+        const skip = (page - 1) * limit;
+        const results = await mongoose.model("products").aggregate([
+            { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+            {
+                $lookup: {
+                    from: "sales",
+                    let: { productId: "$_id" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$productId", "$$productId"] } } }
+                    ],
+                    as: "sales"
+                }
+            },
+            {
+                $addFields: {
+                    sold: { $sum: "$sales.quantity" }
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    stock: "$quantity",
+                    sold: 1
+                }
+            },
+            {
+                $facet: {
+                    metadata: [{ $count: "total" }],
+                    data: [{ $skip: skip }, { $limit: limit }]
+                }
+            }
+        ]);
+
+        const totalCount = results[0]?.metadata[0]?.total || 0;
+        const data = results[0]?.data || [];
+        return { data, totalCount };
+    }
+
+    async getCustomerLedger(userId: string, page: number = 1, limit: number = 10): Promise<{ data: any[], totalCount: number }> {
+        const skip = (page - 1) * limit;
+        const results = await this.model.aggregate([
+            { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+            {
+                $group: {
+                    _id: "$customerName",
+                    name: { $first: "$customerName" },
+                    transactions: { $sum: 1 },
+                    totalSpent: { $sum: "$totalAmount" }
+                }
+            },
+            { $sort: { totalSpent: -1 } },
+            {
+                $facet: {
+                    metadata: [{ $count: "total" }],
+                    data: [{ $skip: skip }, { $limit: limit }]
+                }
+            }
+        ]);
+
+        const totalCount = results[0]?.metadata[0]?.total || 0;
+        const data = results[0]?.data || [];
+        return { data, totalCount };
     }
 }

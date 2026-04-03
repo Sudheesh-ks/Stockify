@@ -46,4 +46,28 @@ export class SaleController implements ISaleController {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);
         }
     }
+
+    async getItemsReport(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = (req as any).userId;
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._saleService.getItemsReport(userId, page, limit);
+            sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, result);
+        } catch (error) {
+            sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);
+        }
+    }
+
+    async getCustomerLedger(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = (req as any).userId;
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._saleService.getCustomerLedger(userId, page, limit);
+            sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, result);
+        } catch (error) {
+            sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);
+        }
+    }
 }
