@@ -1,6 +1,6 @@
 import userModel, { userDocument } from "../../models/userModel";
 import { BaseRepository } from "../baseRepository";
-import { IAuthRepository } from "../interface/iAuthRepository";
+import { IAuthRepository } from "../interface/IAuthRepository";
 
 export class AuthRepository extends BaseRepository<userDocument> implements IAuthRepository {
     constructor() {

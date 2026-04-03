@@ -1,7 +1,7 @@
 import otpModel, { OtpDocument } from "../../models/otpModel";
 import { OtpTypes } from "../../types/otp";
 import { BaseRepository } from "../baseRepository";
-import { IOtpRepository } from "../interface/iOtpRepository";
+import { IOtpRepository } from "../interface/IOtpRepository";
 
 export class OtpRepository
   extends BaseRepository<OtpDocument>

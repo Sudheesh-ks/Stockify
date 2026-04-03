@@ -3,8 +3,8 @@ import { HttpResponse } from "../../constants/responseMessage.constants";
 import { UserDTO } from "../../dtos/user.dto";
 import { toUserDTO } from "../../mappers/user.mapper";
 import { userDocument } from "../../models/userModel";
-import { IAuthRepository } from "../../repositories/interface/iAuthRepository";
-import { IOtpRepository } from "../../repositories/interface/iOtpRepository";
+import { IAuthRepository } from "../../repositories/interface/IAuthRepository";
+import { IOtpRepository } from "../../repositories/interface/IOtpRepository";
 import { sendOTP } from "../../utils/mail.util";
 import { generateOTP } from "../../utils/otp.util";
 import {
@@ -14,7 +14,7 @@ import {
   isValidUsername,
 } from "../../utils/validation.util";
 import bcrypt from "bcrypt";
-import { IAuthService } from "../interface/iAuthService";
+import { IAuthService } from "../interface/IAuthService";
 
 export class AuthService implements IAuthService {
   constructor(

@@ -8,8 +8,8 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../../utils/jwt.util";
-import { IAuthService } from "../../services/interface/iAuthService";
 import { IAuthController } from "../interface/iAuthController";
+import { IAuthService } from "../../services/interface/IAuthService";
 
 export class AuthController implements IAuthController {
   constructor(private readonly _authService: IAuthService) {}
