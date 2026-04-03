@@ -21,10 +21,8 @@ export const loginAPI = async (email: string, password: string) => {
 
 export const refreshTokenAPI = async () => {
     try {
-        console.log("Calling refresh token API...");
         const res = await refreshApi.get(AUTH_API.REFRESH_TOKEN);
         
-        console.log("Refresh token response full data:", res.data);
         const { accessToken, user } = res.data.data;
         localStorage.setItem("token", accessToken);
         return { accessToken, user };

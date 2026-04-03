@@ -1,3 +1,4 @@
+import React from 'react';
 import { X, Save } from "lucide-react";
 
 interface AddEditModalProps {

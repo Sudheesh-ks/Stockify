@@ -1,14 +1,30 @@
-import { DollarSign, Package, Users } from "lucide-react";
+import { DollarSign, Package, Users, ArrowRight, Store, UserCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import DashboardLayout from "../layout/DashboardLayout";
+import { useAuth } from "../hooks/useAuth";
+import { useEffect, useState } from "react";
+import { getAllProductsAPI } from "../services/productServices";
+import { getAllCustomersAPI } from "../services/customerServices";
+import { getAllSalesAPI } from "../services/saleServices";
+import { showErrorToast } from "../utils/errorHandler";
 
-const StatCard = ({ title, value, Icon }: any) => (
-  <div className="flex items-center justify-between p-5 rounded-2xl bg-[#0d1117]/90 border border-[#1a1f2a] shadow-xl">
-    <div>
-      <p className="text-sm text-gray-400">{title}</p>
-      <h3 className="text-2xl font-bold text-white mt-1">{value}</h3>
+const StatCard = ({ title, value, Icon, link }: any) => (
+  <div className="group flex flex-col p-6 rounded-2xl bg-[#0d1117]/80 border border-[#1a1f2a] hover:border-emerald-500/50 shadow-xl transition-all duration-300">
+    <div className="flex items-center justify-between mb-4">
+      <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-emerald-500/10 group-hover:bg-emerald-500/20 shadow-inner transition-colors">
+        <Icon className="text-emerald-400 w-6 h-6" />
+      </div>
+      <Link 
+        to={link}
+        className="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-emerald-400 transition-colors uppercase tracking-wider"
+      >
+        View More
+        <ArrowRight className="w-3 h-3" />
+      </Link>
     </div>
-    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/10">
-      <Icon className="text-emerald-400 w-5 h-5" />
+    <div>
+      <p className="text-sm font-medium text-gray-400 mb-1">{title}</p>
+      <h3 className="text-3xl font-bold text-white tracking-tight">{value}</h3>
     </div>
   </div>
 );
@@ -40,69 +56,124 @@ const Table = ({ title, headers, data }: any) => (
 );
 
 const Dashboard = () => {
-  // 🔥 dummy data (replace with API later)
-  const stats = {
-    sales: 25000,
-    items: 120,
-    customers: 45,
+  const { user } = useAuth();
+  const [stats, setStats] = useState({
+    products: 0,
+    customers: 0,
+    sales: 0,
+    isLoading: true
+  });
+
+  const [recentSales, setRecentSales] = useState<any[]>([]);
+  const [recentProducts, setRecentProducts] = useState<any[]>([]);
+  const [recentCustomers, setRecentCustomers] = useState<any[]>([]);
+
+  const fetchStats = async () => {
+    try {
+      const [prodData, custData, saleData] = await Promise.all([
+        getAllProductsAPI("", 1, 5),
+        getAllCustomersAPI("", 1, 5),
+        getAllSalesAPI({ limit: 5 })
+      ]);
+
+      setStats({
+        products: prodData.totalCount || 0,
+        customers: custData.totalCount || 0,
+        sales: saleData.totalCount || 0,
+        isLoading: false
+      });
+
+      setRecentProducts(prodData.products.map((p: any) => [p.name, p.quantity, `$${p.price}`]));
+      setRecentCustomers(custData.customers.map((c: any) => [c.name, c.phone]));
+      setRecentSales(saleData.sales.map((s: any) => [s.productName, s.customerName || "Cash", s.quantity, `$${s.totalAmount}`]));
+
+    } catch (error) {
+      showErrorToast(error);
+    } finally {
+      setStats(prev => ({ ...prev, isLoading: false }));
+    }
   };
 
-  const customers = [
-    ["John", "9876543210"],
-    ["Alice", "9123456780"],
-    ["Bob", "9988776655"],
-    ["Rahul", "9001122334"],
-    ["Anu", "9554433221"],
-  ];
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
-  const sales = [
-    ["Pen", "John", "2", "₹40"],
-    ["Book", "Alice", "1", "₹120"],
-    ["Bag", "Bob", "1", "₹800"],
-    ["Mouse", "Rahul", "1", "₹500"],
-    ["Keyboard", "Anu", "1", "₹700"],
-  ];
-
-  const items = [
-    ["Pen", "50", "₹20"],
-    ["Book", "30", "₹120"],
-    ["Bag", "10", "₹800"],
-    ["Mouse", "15", "₹500"],
-    ["Keyboard", "12", "₹700"],
-  ];
+  if (stats.isLoading || !user) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
+          <p className="text-gray-400 font-medium animate-pulse">Initializing your dashboard...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
-    <div className="min-h-screen bg-gradient-to-br from-[#05070d] via-[#0b0f17] to-[#0a0e14] text-white p-6">
+      <div className="flex flex-col gap-8 p-6 md:p-8 min-h-screen bg-transparent">
+        
+        {/* HERO SECTION */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 p-8 rounded-3xl bg-gradient-to-r from-emerald-500/10 to-transparent border border-emerald-500/20 shadow-2xl">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-black text-white flex items-center gap-4 uppercase tracking-tighter">
+              <Store className="w-10 h-10 text-emerald-400" />
+              {user?.shopname || "Storehouse"}
+            </h1>
+            <div className="flex items-center gap-2 text-emerald-400 font-bold bg-emerald-500/10 w-fit px-3 py-1 rounded-full text-xs">
+              <UserCircle className="w-4 h-4" />
+              Welcome back, {user?.username}
+            </div>
+          </div>
+          <div className="flex flex-col items-end text-right">
+            <p className="text-gray-400 text-sm italic font-medium">Dashboard Overview</p>
+            <p className="text-gray-500 text-xs">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          </div>
+        </div>
 
-      {/* TOP CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-        <StatCard title="Total Sales" value={`₹${stats.sales}`} Icon={DollarSign} />
-        <StatCard title="Total Items" value={stats.items} Icon={Package} />
-        <StatCard title="Total Customers" value={stats.customers} Icon={Users} />
+        {/* TOP CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatCard 
+            title="Total Products" 
+            value={stats.products} 
+            Icon={Package} 
+            link="/products"
+          />
+          <StatCard 
+            title="Total Customers" 
+            value={stats.customers} 
+            Icon={Users} 
+            link="/customers"
+          />
+          <StatCard 
+            title="Total Sales" 
+            value={stats.sales} 
+            Icon={DollarSign} 
+            link="/sales"
+          />
+        </div>
+
+        {/* TABLES */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Table
+            title="Recent Customers"
+            headers={["Name", "Mobile"]}
+            data={recentCustomers}
+          />
+
+          <Table
+            title="Recent Sales"
+            headers={["Item", "Customer", "Qty", "Amount"]}
+            data={recentSales}
+          />
+
+          <Table
+            title="Latest Stock"
+            headers={["Item", "Stock", "Price"]}
+            data={recentProducts}
+          />
+        </div>
       </div>
-
-      {/* TABLES */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <Table
-          title="Latest Customers"
-          headers={["Name", "Mobile"]}
-          data={customers}
-        />
-
-        <Table
-          title="Latest Sales"
-          headers={["Item", "Customer", "Qty", "Amount"]}
-          data={sales}
-        />
-
-        <Table
-          title="Latest Items"
-          headers={["Item", "Stock", "Price"]}
-          data={items}
-        />
-      </div>
-    </div>
     </DashboardLayout>
   );
 };

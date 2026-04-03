@@ -147,10 +147,8 @@ async logoutUser(req: Request, res: Response): Promise<void> {
 
 
     async refreshToken(req: Request, res: Response): Promise<void> {
-        console.log("Backend: refreshToken endpoint reached");
         try {
             const token = req.cookies.refreshToken;
-            console.log("Backend: Refresh token from cookies:", token ? "Found" : "Missing");
             
             if (!token) {
                 sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.REFRESH_TOKEN_MISSING);
@@ -158,24 +156,20 @@ async logoutUser(req: Request, res: Response): Promise<void> {
             }
 
             const decoded = verifyRefreshToken(token);
-            console.log("Backend: Token decoded successfully for user ID:", decoded.id);
             const user = await this._authService.getUserById(decoded.id);
 
             if (!user) {
-                console.warn("Backend: User not found for decoded ID:", decoded.id);
                 sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_NOT_FOUND);
                 return;
             }
 
             const newAccessToken = generateAccessToken(user._id!, user.email);
-            console.log("Backend: New access token generated successfully");
 
             sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, {
                 accessToken: newAccessToken,
                 user: user,
             });
         } catch (error: any) {
-            console.error("Backend: Refresh token failed with error:", error.message);
             sendResponse(res, HttpStatus.UNAUTHORIZED, false, error.message, null, error);
         }
     }

@@ -20,7 +20,7 @@ import { getAllProductsAPI } from "../services/productServices";
 import { createSaleAPI, getAllSalesAPI } from "../services/saleServices";
 import { showErrorToast } from "../utils/errorHandler";
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 1;
 
 const SaleSchema = Yup.object().shape({
     productId: Yup.string().required("Product is required"),

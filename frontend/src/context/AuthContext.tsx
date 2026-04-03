@@ -44,16 +44,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      if (!token) {
-        try {
-          const result = await refreshTokenAPI();
-          if (result && result.accessToken) {
-            setToken(result.accessToken);
-            setUser(result.user);
-            setIsAuthenticated(true);
-          }
-        } catch (err) {
-          console.log("Initial session refresh failed:", err);
+      try {
+        const result = await refreshTokenAPI();
+        if (result && result.accessToken) {
+          setToken(result.accessToken);
+          setUser(result.user);
+          setIsAuthenticated(true);
+        }
+      } catch (err) {
+        console.log("Initial session refresh failed:", err);
+        // If we were expecting to be logged in but refresh failed, clear state
+        if (localStorage.getItem('token')) {
+          setToken(null);
+          setIsAuthenticated(false);
+          localStorage.removeItem('token');
         }
       }
     };

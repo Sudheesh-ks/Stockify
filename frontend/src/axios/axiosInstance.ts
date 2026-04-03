@@ -9,7 +9,6 @@ export const userApi = axios.create({
     },
 });
 
-// Dedicated instance for refresh to avoid interceptor interference
 export const refreshApi = axios.create({
     baseURL: import.meta.env.VITE_APP_BASE_URL,
     withCredentials: true,
@@ -29,7 +28,6 @@ userApi.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         const isRefreshRequest = originalRequest.url.includes("/refresh-token");
-        console.log("Response Interceptor:", { status: error.response?.status, url: originalRequest.url, isRefreshRequest, retry: originalRequest._retry });
 
         if(
             error.response &&
@@ -37,14 +35,10 @@ userApi.interceptors.response.use(
             !originalRequest._retry &&
             !isRefreshRequest
         ){
-            console.log("Attempting refresh token regeneration...");
             originalRequest._retry = true;
             try {
                 const newAccessToken = await refreshTokenAPI();
-                console.log("New Access Token acquired:", !!newAccessToken);
                 if(newAccessToken) {
-                    console.log("Applying new access token to retry headers");
-                    // Use more reliable way to set headers in axios 1.x
                     if (originalRequest.headers && typeof originalRequest.headers.set === 'function') {
                         originalRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
                     } else {
@@ -52,7 +46,6 @@ userApi.interceptors.response.use(
                         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
                     }
                     
-                    // Also update the global instance for future requests
                     userApi.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
                     
                     return userApi(originalRequest);
@@ -61,7 +54,6 @@ userApi.interceptors.response.use(
                 console.error("Token refresh failed during interceptor:", refreshError);
             }
 
-            console.warn("Refresh failed or no session, logging out.");
             localStorage.removeItem("token");
             window.location.href = "/";
         }
