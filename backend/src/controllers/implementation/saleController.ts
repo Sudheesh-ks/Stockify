@@ -10,9 +10,9 @@ export class SaleController implements ISaleController {
 
     async recordSale(req: Request, res: Response): Promise<void> {
         try {
-            const { productId, quantity, customerName, date } = req.body;
+            const { items, customerName, date } = req.body;
             const userId = (req as any).userId;
-            const sale = await this._saleService.recordSale(userId, productId, quantity, customerName, date ? new Date(date) : undefined);
+            const sale = await this._saleService.recordSale(userId, items, customerName, date ? new Date(date) : undefined);
             sendResponse(res, HttpStatus.CREATED, true, HttpResponse.CREATED, sale);
         } catch (error) {
             sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message || HttpResponse.SERVER_ERROR, null, error);

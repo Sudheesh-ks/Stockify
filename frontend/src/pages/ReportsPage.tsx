@@ -70,9 +70,8 @@ const ReportsPage = () => {
                 fullData = res.sales;
                 excelData = fullData.map(s => ({
                     "Date": new Date(s.date).toLocaleDateString(),
-                    "Product": s.productName,
-                    "Quantity": s.quantity,
-                    "Price": `₹${s.price.toFixed(2)}`,
+                    "Products": s.items.map((i: any) => i.productName).join(", "),
+                    "Total Quantity": s.items.reduce((sum: number, i: any) => sum + i.quantity, 0),
                     "Total Amount": `₹${s.totalAmount.toFixed(2)}`,
                     "Customer": s.customerName
                 }));
@@ -115,8 +114,14 @@ const ReportsPage = () => {
             if (activeTab === "sales") {
                 const res = await getAllSalesAPI({ limit: 5000 });
                 fullData = res.sales;
-                headers = ["Date", "Product", "Qty", "Total", "Customer"];
-                body = fullData.map(s => [new Date(s.date).toLocaleDateString(), s.productName, s.quantity, `₹${s.totalAmount}`, s.customerName]);
+                headers = ["Date", "Products", "Total Qty", "Total", "Customer"];
+                body = fullData.map(s => [
+                    new Date(s.date).toLocaleDateString(), 
+                    s.items.map((i: any) => i.productName).join(", "), 
+                    s.items.reduce((sum: number, i: any) => sum + i.quantity, 0), 
+                    `Rs.${s.totalAmount.toFixed(2)}`, 
+                    s.customerName
+                ]);
             } else if (activeTab === "items") {
                 const res = await getItemsReportAPI(1, 5000);
                 fullData = res.data;
@@ -126,7 +131,7 @@ const ReportsPage = () => {
                 const res = await getCustomerLedgerAPI(1, 5000);
                 fullData = res.data;
                 headers = ["Customer Name", "Transactions", "Total Spent"];
-                body = fullData.map(l => [l.name, l.transactions, `₹${l.totalSpent.toFixed(2)}`]);
+                body = fullData.map(l => [l.name, l.transactions, `Rs.${l.totalSpent.toFixed(2)}`]);
             }
 
             autoTable(doc, {
@@ -143,8 +148,20 @@ const ReportsPage = () => {
     // 📑 Columns
     const salesColumns: Column<any>[] = [
         { header: "Date", accessor: (s: SaleTypes) => new Date(s.date).toLocaleDateString() },
-        { header: "Product", accessor: "productName", className: "font-bold text-white" },
-        { header: "Qty", accessor: "quantity", className: "text-emerald-400" },
+        { 
+            header: "Products", 
+            accessor: (s: SaleTypes) => {
+                const names = s.items.map(i => i.productName);
+                if (names.length <= 1) return names[0] || "Unknown";
+                return `${names[0]} (+${names.length - 1} more)`;
+            },
+            className: "font-bold text-white" 
+        },
+        { 
+            header: "Total Qty", 
+            accessor: (s: SaleTypes) => s.items.reduce((sum, i) => sum + i.quantity, 0), 
+            className: "text-emerald-400" 
+        },
         { header: "Total", accessor: (s: SaleTypes) => `₹${s.totalAmount.toFixed(2)}`, className: "font-bold" },
         { header: "Customer", accessor: "customerName" },
     ];

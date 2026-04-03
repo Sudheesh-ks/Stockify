@@ -10,36 +10,46 @@ export class SaleService implements ISaleService {
         private readonly _productRepository: ProductRepository
     ) {}
 
-    async recordSale(userId: string, productId: string, quantity: number, customerName: string = "Cash", date: Date = new Date()): Promise<SaleDTO> {
-        // 1. Fetch product
-        const product = await this._productRepository.getProduct(productId, userId);
+    async recordSale(userId: string, items: { productId: string, quantity: number }[], customerName: string = "Cash", date: Date = new Date()): Promise<SaleDTO> {
+        let totalAmount = 0;
+        const saleItems = [];
 
-        // 2. Validate stock
-        if (product.quantity < quantity) {
-            throw new Error("Insufficient stock");
+        // 1. Validate all products and stock first
+        for (const item of items) {
+            const product = await this._productRepository.getProduct(item.productId, userId);
+            if (product.quantity < item.quantity) {
+                throw new Error(`Insufficient stock for ${product.name}`);
+            }
+            
+            const itemTotal = item.quantity * product.price;
+            totalAmount += itemTotal;
+            
+            saleItems.push({
+                productId: product._id,
+                quantity: item.quantity,
+                price: product.price
+            });
         }
 
-        // 3. Calculate total
-        const totalAmount = quantity * product.price;
-
-        // 4. Create sale record
+        // 2. Create the unified sale record
         const sale = await this._saleRepository.createSale(userId, {
-            productId: product._id,
-            quantity,
-            price: product.price,
+            items: saleItems as any,
             totalAmount,
             customerName,
             date: date || new Date()
         });
 
-        // 5. Reduce product stock
-        await this._productRepository.updateProduct(productId, userId, {
-            quantity: product.quantity - quantity
-        } as any);
+        // 3. Reduce stock for each product
+        for (const item of saleItems) {
+            const product = await this._productRepository.getProduct(item.productId.toString(), userId);
+            await this._productRepository.updateProduct(item.productId.toString(), userId, {
+                quantity: product.quantity - item.quantity
+            } as any);
+        }
 
-        // 6. Return DTO (Need to populate product for the name in the DTO)
-        const populatedSale = await this._saleRepository.getAllSales(userId, { _id: sale._id }, 1, 1);
-        return toSaleDTO(populatedSale.sales[0]);
+        // 4. Return DTO (Refetch to ensure population)
+        const populatedSale = await this._saleRepository.findOne({ _id: sale._id, userId: userId as any });
+        return toSaleDTO(populatedSale!);
     }
 
     async getSales(userId: string, filters: { startDate?: Date, endDate?: Date, productId?: string, customerName?: string }, page: number = 1, limit: number = 5): Promise<{ sales: SaleDTO[], totalCount: number, totalPages: number, currentPage: number }> {
@@ -99,16 +109,15 @@ export class SaleService implements ISaleService {
             throw new Error("Sale not found or unauthorized");
         }
 
-        // 2. Fetch product
-        const productId = sale.productId.toString();
-        const product = await this._productRepository.getProduct(productId, currentUserId);
+        // 2. Restore stock for each item
+        for (const item of sale.items) {
+            const product = await this._productRepository.getProduct(item.productId.toString(), currentUserId);
+            await this._productRepository.updateProduct(item.productId.toString(), currentUserId, {
+                quantity: (product.quantity || 0) + (item.quantity || 0)
+            } as any);
+        }
 
-        // 3. Restore stock
-        await this._productRepository.updateProduct(productId, currentUserId, {
-            quantity: (product.quantity || 0) + (sale.quantity || 0)
-        } as any);
-
-        // 4. Delete the sale record
+        // 3. Delete the sale record
         await this._saleRepository.deleteSale(id);
     }
 }

@@ -20,7 +20,7 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
             .sort({ date: -1 })
             .skip((page - 1) * limit)
             .limit(limit)
-            .populate('productId')
+            .populate('items.productId')
             .exec();
 
         return { sales, totalCount };
@@ -32,7 +32,7 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
             customerName: { $regex: customerName, $options: 'i' } 
         })
             .sort({ date: -1 })
-            .populate('productId')
+            .populate('items.productId')
             .exec();
     }
     
@@ -45,14 +45,15 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
                     from: "sales",
                     let: { productId: "$_id" },
                     pipeline: [
-                        { $match: { $expr: { $eq: ["$productId", "$$productId"] } } }
+                        { $unwind: "$items" },
+                        { $match: { $expr: { $eq: ["$items.productId", "$$productId"] } } }
                     ],
-                    as: "sales"
+                    as: "saleItems"
                 }
             },
             {
                 $addFields: {
-                    sold: { $sum: "$sales.quantity" }
+                    sold: { $sum: "$saleItems.items.quantity" }
                 }
             },
             {
@@ -81,8 +82,8 @@ export class SaleRepository extends BaseRepository<SaleDocument> implements ISal
             { $match: { userId: new mongoose.Types.ObjectId(userId) } },
             {
                 $group: {
-                    _id: "$customerName",
-                    name: { $first: "$customerName" },
+                    _id: { $cond: [{ $or: [{ $eq: ["$customerName", ""] }, { $not: ["$customerName"] }] }, "User not found", "$customerName"] },
+                    name: { $first: { $cond: [{ $or: [{ $eq: ["$customerName", ""] }, { $not: ["$customerName"] }] }, "User not found", "$customerName"] } },
                     transactions: { $sum: 1 },
                     totalSpent: { $sum: "$totalAmount" }
                 }

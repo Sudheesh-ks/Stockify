@@ -1,10 +1,14 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
-export interface SaleDocument extends Document {
-  userId: Types.ObjectId;
+export interface SaleItem {
   productId: Types.ObjectId;
   quantity: number;
   price: number;
+}
+
+export interface SaleDocument extends Document {
+  userId: Types.ObjectId;
+  items: SaleItem[];
   totalAmount: number;
   customerName: string;
   date: Date;
@@ -17,21 +21,25 @@ const saleSchema: Schema<SaleDocument> = new Schema<SaleDocument>(
       ref: "users",
       required: true,
     },
-    productId: {
-      type: Schema.Types.ObjectId,
-      ref: "products",
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
+    items: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "products",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
+        price: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+      }
+    ],
     totalAmount: {
       type: Number,
       required: true,
