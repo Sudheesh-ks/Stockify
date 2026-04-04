@@ -48,7 +48,7 @@ const Dashboard = () => {
       setRecentSales(
         data.recent.sales.map((s: SaleTypes) => {
           const firstItem = s.items?.[0];
-          const productName = firstItem?.productId?.name ?? "—";
+          const productName = typeof firstItem?.productId === "object" ? firstItem.productId.name : "—";
           const totalQty = s.items?.reduce((acc: number, i: any) => acc + i.quantity, 0) ?? 0;
           return [productName, s.customerName || "Cash", totalQty, `₹${s.totalAmount}`];
         })

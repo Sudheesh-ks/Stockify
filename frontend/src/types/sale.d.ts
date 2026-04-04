@@ -1,5 +1,8 @@
 export interface SaleItem {
-  productId: string;
+  productId: string | {
+    _id: string;
+    name: string;
+  };
   productName?: string;
   quantity: number;
   price: number;
