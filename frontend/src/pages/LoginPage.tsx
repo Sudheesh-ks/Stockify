@@ -33,7 +33,6 @@ const Loginpage = () => {
 
   const validateField = async (name: string, value: string) => {
     try {
-      // Create a temporary object with just the field we want to validate
       const tempObject = { [name]: value };
       const tempSchema = Yup.object({ [name]: Yup.reach(validationSchema, name) });
       await tempSchema.validate(tempObject);
@@ -63,19 +62,15 @@ const Loginpage = () => {
     e.preventDefault();
 
     try {
-      // Validate form based on the current tab
       if (tab === "login") {
-        // Validate only email and password for login
         const emailSchema = Yup.object({ email: Yup.reach(validationSchema, 'email') });
         const passwordSchema = Yup.object({ password: Yup.reach(validationSchema, 'password') });
         await emailSchema.validate({ email: formData.email });
         await passwordSchema.validate({ password: formData.password });
       } else {
-        // Validate all fields for registration
         await validationSchema.validate(formData);
       }
 
-      // Clear errors if validation passes
       setErrors({
         email: "",
         username: "",
@@ -83,7 +78,6 @@ const Loginpage = () => {
         password: "",
       });
 
-      // Proceed with login or register
       if (tab === "login") {
         await login(formData.email, formData.password);
         navigate("/dashboard");

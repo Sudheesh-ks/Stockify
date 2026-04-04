@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Plus, Package } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 
 // Layout
 import DashboardLayout from "../layout/DashboardLayout";
@@ -17,15 +16,9 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import type { ProductTypes } from "../types/product";
 import { createProductAPI, deleteProductAPI, getAllProductsAPI, updateProductAPI } from "../services/productServices";
 import { showErrorToast } from "../utils/errorHandler";
+import { ProductSchema } from "../utils/validationSchema";
 
 const ITEMS_PER_PAGE = 6;
-
-const ProductSchema = Yup.object().shape({
-  name: Yup.string().min(2, "Too short!").required("Required"),
-  description: Yup.string().min(5, "Too short!").required("Required"),
-  quantity: Yup.number().min(0).required("Required"),
-  price: Yup.number().min(0).required("Required"),
-});
 
 const ProductsPage = () => {
   const [products, setProducts] = useState<ProductTypes[]>([]);
@@ -35,7 +28,6 @@ const ProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductTypes | null>(null);
 
-  // Confirmation State
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -53,7 +45,7 @@ const ProductsPage = () => {
   const fetchProducts = async () => {
     try {
       const data = await getAllProductsAPI(searchQuery, currentPage, ITEMS_PER_PAGE);
-      console.log("Fetch Products Result:", data); // Diagnostic log
+      console.log("Fetch Products Result:", data);
       setProducts(data.products || []);
       setTotalPages(data.totalPages || 1);
     } catch (error) {

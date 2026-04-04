@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Plus, Users } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 
 // Layout
     import DashboardLayout from "../layout/DashboardLayout";
@@ -17,14 +16,9 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import type { CustomerTypes } from "../types/customer";
 import { createCustomerAPI, deleteCustomerAPI, getAllCustomersAPI, updateCustomerAPI } from "../services/customerServices";
 import { showErrorToast } from "../utils/errorHandler";
+import { CustomerSchema } from "../utils/validationSchema";
 
 const ITEMS_PER_PAGE = 6;
-
-const CustomerSchema = Yup.object().shape({
-  name: Yup.string().min(2, "Too short!").required("Required"),
-  address: Yup.string().min(5, "Too short!").required("Required"),
-  mobile: Yup.string().matches(/^[0-9]+$/, "Must be only digits").min(10, "Invalid mobile number").required("Required"),
-});
 
 const CustomersPage = () => {
   const [customers, setCustomers] = useState<CustomerTypes[]>([]);
@@ -34,7 +28,6 @@ const CustomersPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<CustomerTypes | null>(null);
 
-  // Confirmation State
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
     title: string;

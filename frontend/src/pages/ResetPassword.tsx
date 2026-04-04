@@ -29,7 +29,6 @@ const ResetPassword = () => {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    // Get email from location state or localStorage
     const stateEmail = location.state?.email;
     const tempData = JSON.parse(localStorage.getItem("tempUserData") || "{}");
 
@@ -113,7 +112,7 @@ const ResetPassword = () => {
         console.error('Response or success property missing:', response);
         toast.error(response?.message || "Failed to reset password");
       }
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Reset password API call failed:', error);
       showErrorToast(error);
     } finally {

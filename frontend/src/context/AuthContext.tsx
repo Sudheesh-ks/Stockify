@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { loginAPI, registerAPI, verifyOtpAPI, refreshTokenAPI, logoutAPI } from '../services/authServices';
 import toast from 'react-hot-toast';
@@ -42,7 +42,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
     const initAuth = async () => {
       try {
         const result = await refreshTokenAPI();
@@ -96,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(userData);
       setIsAuthenticated(true);
       toast.success('Login successful!');
-    } catch (err: unknown) {
+    } catch (err) {
       showErrorToast(err);
       setError('Login failed');
       throw err;
@@ -117,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       toast.success(response.message || 'Registration successful!');
-    } catch (err: unknown) {
+    } catch (err) {
       showErrorToast(err);
       setError('Registration failed');
       throw err;
@@ -149,7 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       return response;
-    } catch (err: unknown) {
+    } catch (err) {
       showErrorToast(err);
       setError('OTP verification failed');
       throw err;

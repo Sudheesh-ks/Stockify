@@ -5,25 +5,25 @@ import { useAuth } from "../hooks/useAuth";
 import Loading from "../components/Loading";
 
 interface PublicRouteProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 const PublicRoute = ({ children }: PublicRouteProps) => {
-    const { isAuthenticated, loading, checkAuthState } = useAuth();
+  const { isAuthenticated, loading, checkAuthState } = useAuth();
 
-    useEffect(() => {
-        checkAuthState();
-    }, [checkAuthState]);
+  useEffect(() => {
+    checkAuthState();
+  }, [checkAuthState]);
 
-    if (loading) {
-        return <Loading fullPage message="Loading..." />;
-    }
+  if (loading) {
+    return <Loading fullPage message="Loading..." />;
+  }
 
-    if (isAuthenticated) {
-        return <Navigate to="/dashboard" replace />;
-    }
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
-    return <>{children}</>;
+  return <>{children}</>;
 };
 
 export default PublicRoute;

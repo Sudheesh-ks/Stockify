@@ -4,25 +4,25 @@ import { useAuth } from "../hooks/useAuth";
 import Loading from "../components/Loading";
 
 interface ProtectedRouteProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isAuthenticated, loading, checkAuthState } = useAuth();
+  const { isAuthenticated, loading, checkAuthState } = useAuth();
 
-    useEffect(() => {
-        checkAuthState();
-    }, [checkAuthState]);
+  useEffect(() => {
+    checkAuthState();
+  }, [checkAuthState]);
 
-    if (loading) {
-        return <Loading fullPage message="Loading..." />;
-    }
+  if (loading) {
+    return <Loading fullPage message="Loading..." />;
+  }
 
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
-    }
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
-    return <>{children}</>;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

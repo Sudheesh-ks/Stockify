@@ -94,16 +94,13 @@ const OTPVerification = () => {
       }else{
         toast.error("Failed to resend OTP");
       }
-    } catch (err: unknown) {
+    } catch (err) {
       showErrorToast(err);
     }
   };
 
   return (
     <div className="min-h-screen bg-[#080b12] flex items-center justify-center p-4 relative overflow-hidden">
-
-      {/* UI same as yours */}
-
       <div className="relative z-10 w-full max-w-sm">
         <div className="flex items-center justify-center gap-2.5 mb-8">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
@@ -146,7 +143,7 @@ const OTPVerification = () => {
             {loading ? "Verifying..." : "Verify"}
           </button>
 
-          {/* Timer + Resend */}
+          {/* Timer */}
           <p className="text-center text-xs text-gray-500 mt-4">
             {timer > 0 ? (
               <>Resend in {timer}s</>

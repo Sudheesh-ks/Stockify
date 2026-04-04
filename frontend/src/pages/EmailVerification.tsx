@@ -54,7 +54,7 @@ const ForgotPassword = () => {
         console.error('Response or success property missing:', response);
         toast.error(response?.message || "Failed to send OTP");
       }
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('API call failed:', error);
       showErrorToast(error);
     } finally {

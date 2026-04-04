@@ -36,3 +36,7 @@ export const SALE_API = {
     GET_LEDGER_REPORT: '/api/sales/reports/ledger',
     DELETE: (id: string) => `/api/sales/${id}`
 }
+
+export const DASHBOARD_API = {
+    GET_STATS: '/api/dashboard/stats'
+}

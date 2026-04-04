@@ -23,7 +23,6 @@ const ReportsPage = () => {
     const [activeTab, setActiveTab] = useState<"sales" | "items" | "ledger">("sales");
     const [isLoading, setIsLoading] = useState(true);
 
-    // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const ITEMS_PER_PAGE = 10;
@@ -57,10 +56,10 @@ const ReportsPage = () => {
 
     const handleTabChange = (tab: "sales" | "items" | "ledger") => {
         setActiveTab(tab);
-        setCurrentPage(1); // Reset to first page when tab changes
+        setCurrentPage(1);
     };
 
-    // 📤 Export Functions (Fetch all data for export)
+    // Export Functions
     const exportToExcel = async () => {
         try {
             let fullData: any[] = [];
@@ -146,7 +145,7 @@ const ReportsPage = () => {
         }
     };
 
-    // 📑 Columns
+    // Columns
     const salesColumns: Column<any>[] = [
         { header: "Date", accessor: (s: SaleTypes) => new Date(s.date).toLocaleDateString() },
         { 

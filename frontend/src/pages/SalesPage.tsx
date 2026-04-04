@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { Formik, Form, Field, FieldArray } from "formik";
-import * as Yup from "yup";
 
 // Layout
 import DashboardLayout from "../layout/DashboardLayout";
@@ -33,21 +32,9 @@ import {
   getAllSalesAPI,
 } from "../services/saleServices";
 import { showErrorToast } from "../utils/errorHandler";
+import { SaleSchema } from "../utils/validationSchema";
 
 const ITEMS_PER_PAGE = 6;
-
-const SaleSchema = Yup.object().shape({
-  items: Yup.array()
-    .of(
-      Yup.object().shape({
-        productId: Yup.string().required("Product is required"),
-        quantity: Yup.number().min(1, "Min 1").required("Req"),
-      }),
-    )
-    .min(1, "Add at least one product"),
-  customerName: Yup.string().optional(),
-  date: Yup.date().required("Date is required"),
-});
 
 const SalesPage = () => {
   const [sales, setSales] = useState<SaleTypes[]>([]);
@@ -58,7 +45,6 @@ const SalesPage = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<SaleTypes | null>(null);
 
-  // Confirmation State
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
     title: string;

@@ -1,60 +1,14 @@
-import { IndianRupee, Package, Users, ArrowRight, Store, UserCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { IndianRupee, Package, Users, Store, UserCircle } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
 import { useAuth } from "../hooks/useAuth";
-import { useEffect, useState } from "react";
-import { getAllProductsAPI } from "../services/productServices";
-import { getAllCustomersAPI } from "../services/customerServices";
-import { getAllSalesAPI } from "../services/saleServices";
+import { useEffect, useRef, useState } from "react";
+import { getDashboardStatsAPI } from "../services/dashboardServices";
 import { showErrorToast } from "../utils/errorHandler";
 import Loading from "../components/Loading";
+import StatCard from "../components/StatCard";
+import DashboardTable from "../components/DashboardTable";
 
-const StatCard = ({ title, value, Icon, link }: any) => (
-  <div className="group flex flex-col p-6 rounded-2xl bg-[#0d1117]/80 border border-[#1a1f2a] hover:border-emerald-500/50 shadow-xl transition-all duration-300">
-    <div className="flex items-center justify-between mb-4">
-      <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-emerald-500/10 group-hover:bg-emerald-500/20 shadow-inner transition-colors">
-        <Icon className="text-emerald-400 w-6 h-6" />
-      </div>
-      <Link 
-        to={link}
-        className="flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-emerald-400 transition-colors uppercase tracking-wider"
-      >
-        View More
-        <ArrowRight className="w-3 h-3" />
-      </Link>
-    </div>
-    <div>
-      <p className="text-sm font-medium text-gray-400 mb-1">{title}</p>
-      <h3 className="text-3xl font-bold text-white tracking-tight">{value}</h3>
-    </div>
-  </div>
-);
 
-const Table = ({ title, headers, data }: any) => (
-  <div className="bg-[#0d1117]/90 border border-[#1a1f2a] rounded-2xl p-5 shadow-xl">
-    <h3 className="text-white font-semibold mb-4">{title}</h3>
-
-    <table className="w-full text-sm text-left">
-      <thead>
-        <tr className="text-gray-500 border-b border-[#1f2733]">
-          {headers.map((h: string, i: number) => (
-            <th key={i} className="pb-2">{h}</th>
-          ))}
-        </tr>
-      </thead>
-
-      <tbody>
-        {data.map((row: any, i: number) => (
-          <tr key={i} className="border-b border-[#1f2733] last:border-none">
-            {row.map((cell: any, j: number) => (
-              <td key={j} className="py-2 text-gray-300">{cell}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -71,22 +25,31 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const [prodData, custData, saleData] = await Promise.all([
-        getAllProductsAPI("", 1, 3),
-        getAllCustomersAPI("", 1, 3),
-        getAllSalesAPI({ limit: 3 })
-      ]);
+      const data = await getDashboardStatsAPI();
 
       setStats({
-        products: prodData.totalCount || 0,
-        customers: custData.totalCount || 0,
-        sales: saleData.totalCount || 0,
-        isLoading: false
+        products: data.stats.products,
+        customers: data.stats.customers,
+        sales: data.stats.sales,
+        isLoading: false,
       });
 
-      setRecentProducts(prodData.products.map((p: any) => [p.name, p.quantity, `₹${p.price}`]));
-      setRecentCustomers(custData.customers.map((c: any) => [c.name, c.phone]));
-      setRecentSales(saleData.sales.map((s: any) => [s.productName, s.customerName || "Cash", s.quantity, `₹${s.totalAmount}`]));
+      setRecentProducts(
+        data.recent.products.map((p: any) => [p.name, p.quantity, `₹${p.price}`])
+      );
+
+      setRecentCustomers(
+        data.recent.customers.map((c: any) => [c.name, c.mobile])
+      );
+
+      setRecentSales(
+        data.recent.sales.map((s: any) => {
+          const firstItem = s.items?.[0];
+          const productName = firstItem?.productId?.name ?? "—";
+          const totalQty = s.items?.reduce((acc: number, i: any) => acc + i.quantity, 0) ?? 0;
+          return [productName, s.customerName || "Cash", totalQty, `₹${s.totalAmount}`];
+        })
+      );
 
     } catch (error) {
       showErrorToast(error);
@@ -95,7 +58,11 @@ const Dashboard = () => {
     }
   };
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
     fetchStats();
   }, []);
 
@@ -153,19 +120,19 @@ const Dashboard = () => {
 
         {/* TABLES */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Table
+          <DashboardTable
             title="Recent Customers"
             headers={["Name", "Mobile"]}
             data={recentCustomers}
           />
 
-          <Table
+          <DashboardTable
             title="Recent Sales"
             headers={["Item", "Customer", "Qty", "Amount"]}
             data={recentSales}
           />
 
-          <Table
+          <DashboardTable
             title="Latest Stock"
             headers={["Item", "Stock", "Price"]}
             data={recentProducts}
