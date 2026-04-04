@@ -7,6 +7,7 @@ import { getAllProductsAPI } from "../services/productServices";
 import { getAllCustomersAPI } from "../services/customerServices";
 import { getAllSalesAPI } from "../services/saleServices";
 import { showErrorToast } from "../utils/errorHandler";
+import Loading from "../components/Loading";
 
 const StatCard = ({ title, value, Icon, link }: any) => (
   <div className="group flex flex-col p-6 rounded-2xl bg-[#0d1117]/80 border border-[#1a1f2a] hover:border-emerald-500/50 shadow-xl transition-all duration-300">
@@ -101,10 +102,7 @@ const Dashboard = () => {
   if (stats.isLoading || !user) {
     return (
       <DashboardLayout>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin"></div>
-          <p className="text-gray-400 font-medium animate-pulse">Initializing your dashboard...</p>
-        </div>
+        <Loading message="Initializing your dashboard..." className="min-h-[60vh]" />
       </DashboardLayout>
     );
   }

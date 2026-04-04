@@ -1,4 +1,5 @@
 import { Edit, Trash2 } from "lucide-react";
+import Loading from "./Loading";
 
 export interface Column<T> {
   header: string;
@@ -26,11 +27,7 @@ const DataTable = <T extends Record<string, any>>({
   emptyMessage = "No records found.",
 }: DataTableProps<T>) => {
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64 bg-[#0d1117] rounded-xl border border-[#1a1f2a]">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-emerald-500"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (data.length === 0) {
