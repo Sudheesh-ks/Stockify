@@ -161,12 +161,19 @@ export class AuthService implements IAuthService {
     }
 
     const record = await this._otpRepository.findOtpByEmail(email);
-    if (!record || record.purpose !== AuthPurpose.RESET_PASSWORD || record.otp !== "VERIFIED") {
+    if (
+      !record ||
+      record.purpose !== AuthPurpose.RESET_PASSWORD ||
+      record.otp !== "VERIFIED"
+    ) {
       throw new Error(HttpResponse.OTP_EXPIRED_OR_INVALID);
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    const updated = await this._authRepository.updatePasswordByEmail(email, hashedPassword);
+    const updated = await this._authRepository.updatePasswordByEmail(
+      email,
+      hashedPassword,
+    );
 
     if (!updated) {
       throw new Error(HttpResponse.USER_NOT_FOUND);

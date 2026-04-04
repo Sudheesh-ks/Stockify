@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { showErrorToast } from "../utils/errorHandler";
 import { forgotPasswordAPI } from "../services/authServices";
 import InputField from "../components/LoginComponents/InputField";
+import { validateEmail } from "../utils/validationSchema";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -13,12 +14,6 @@ const ForgotPassword = () => {
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const validateEmail = (value: string) => {
-    if (!value) return "Email is required";
-    if (!/\S+@\S+\.\S+/.test(value)) return "Invalid email format";
-    return "";
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

@@ -2,17 +2,20 @@ import userModel, { userDocument } from "../../models/userModel";
 import { BaseRepository } from "../baseRepository";
 import { IAuthRepository } from "../interface/IAuthRepository";
 
-export class AuthRepository extends BaseRepository<userDocument> implements IAuthRepository {
-    constructor() {
-        super(userModel);
-    }
+export class AuthRepository
+  extends BaseRepository<userDocument>
+  implements IAuthRepository
+{
+  constructor() {
+    super(userModel);
+  }
 
-    async createUser(user: Partial<userDocument>): Promise<userDocument> {
-        const createdUser = await this.create(user);
-        return createdUser;
-    }
+  async createUser(user: Partial<userDocument>): Promise<userDocument> {
+    const createdUser = await this.create(user);
+    return createdUser;
+  }
 
-      async findUserById(id: string): Promise<userDocument | null> {
+  async findUserById(id: string): Promise<userDocument | null> {
     const user = await this.findById(id);
     return user ? (user as userDocument) : null;
   }
@@ -23,11 +26,11 @@ export class AuthRepository extends BaseRepository<userDocument> implements IAut
 
   async updatePasswordByEmail(
     email: string,
-    newHashedPassword: string
+    newHashedPassword: string,
   ): Promise<boolean> {
     const updatedUser = await userModel.findOneAndUpdate(
       { email },
-      { $set: { password: newHashedPassword } }
+      { $set: { password: newHashedPassword } },
     );
     return !!updatedUser;
   }

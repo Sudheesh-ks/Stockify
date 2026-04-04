@@ -25,11 +25,11 @@ export const refreshTokenAPI = async () => {
     const { accessToken, user } = res.data.data;
     localStorage.setItem("token", accessToken);
     return { accessToken, user };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Refresh token error:", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
+      message: (error as Error).message,
+      status: (error as { response?: { status?: number } }).response?.status,
+      data: (error as { response?: { data?: unknown } }).response?.data,
     });
     localStorage.removeItem("token");
     return null;

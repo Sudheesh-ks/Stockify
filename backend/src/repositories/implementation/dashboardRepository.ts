@@ -21,7 +21,10 @@ export class DashboardRepository implements IDashboardRepository {
   }
 
   async getRecentCustomers(userId: string): Promise<any[]> {
-    return await customerModel.find({ userId }).sort({ createdAt: -1 }).limit(3);
+    return await customerModel
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(3);
   }
 
   async getRecentSales(userId: string): Promise<any[]> {

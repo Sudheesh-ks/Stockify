@@ -1,23 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Loader2, ChevronDown, Check } from "lucide-react";
+import type { Option, SearchableSelectProps } from "../types/searchableSelect";
 
-interface Option {
-  value: string;
-  label: string;
-  subLabel?: string;
-  original?: any;
-}
-
-interface SearchableSelectProps {
-  onSearch: (query: string) => Promise<Option[]>;
-  onSelect: (option: Option | null) => void;
-  placeholder?: string;
-  label?: string;
-  defaultValue?: string;
-  error?: string;
-  touched?: boolean;
-  allowCustom?: boolean;
-}
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
   onSearch,

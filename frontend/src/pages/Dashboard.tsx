@@ -7,6 +7,9 @@ import { showErrorToast } from "../utils/errorHandler";
 import Loading from "../components/Loading";
 import StatCard from "../components/StatCard";
 import DashboardTable from "../components/DashboardTable";
+import type { ProductTypes } from "../types/product";
+import type { CustomerTypes } from "../types/customer";
+import type { SaleTypes } from "../types/sale";
 
 
 
@@ -19,9 +22,9 @@ const Dashboard = () => {
     isLoading: true
   });
 
-  const [recentSales, setRecentSales] = useState<any[]>([]);
-  const [recentProducts, setRecentProducts] = useState<any[]>([]);
-  const [recentCustomers, setRecentCustomers] = useState<any[]>([]);
+  const [recentSales, setRecentSales] = useState<SaleTypes[]>([]);
+  const [recentProducts, setRecentProducts] = useState<ProductTypes[]>([]);
+  const [recentCustomers, setRecentCustomers] = useState<CustomerTypes[]>([]);
 
   const fetchStats = async () => {
     try {
@@ -35,15 +38,15 @@ const Dashboard = () => {
       });
 
       setRecentProducts(
-        data.recent.products.map((p: any) => [p.name, p.quantity, `₹${p.price}`])
+        data.recent.products.map((p: ProductTypes) => [p.name, p.quantity, `₹${p.price}`])
       );
 
       setRecentCustomers(
-        data.recent.customers.map((c: any) => [c.name, c.mobile])
+        data.recent.customers.map((c: CustomerTypes) => [c.name, c.mobile])
       );
 
       setRecentSales(
-        data.recent.sales.map((s: any) => {
+        data.recent.sales.map((s: SaleTypes) => {
           const firstItem = s.items?.[0];
           const productName = firstItem?.productId?.name ?? "—";
           const totalQty = s.items?.reduce((acc: number, i: any) => acc + i.quantity, 0) ?? 0;

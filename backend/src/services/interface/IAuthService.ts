@@ -3,10 +3,10 @@ import { UserDTO } from "../../dtos/user.dto";
 
 export interface IAuthService {
   registerUser(data: {
-    email: string,
-    username: string,
-    shopname: string,
-    password: string,
+    email: string;
+    username: string;
+    shopname: string;
+    password: string;
   }): Promise<void>;
 
   verifyOtp(

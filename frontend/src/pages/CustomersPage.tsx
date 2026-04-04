@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
 // Layout
-    import DashboardLayout from "../layout/DashboardLayout";
+import DashboardLayout from "../layout/DashboardLayout";
 
 // Components
 import SearchBar from "../components/SearchBar";

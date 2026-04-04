@@ -14,14 +14,14 @@ export class OtpRepository
     await this.findOneAndUpdate(
       { email },
       { ...data, createdAt: new Date() },
-      { upsert: true, new: true }
+      { upsert: true, new: true },
     );
   }
 
   async getOtp(
     email: string,
     otp?: string,
-    purpose?: string
+    purpose?: string,
   ): Promise<OtpTypes | null> {
     const query: any = { email };
     if (otp) query.otp = otp;

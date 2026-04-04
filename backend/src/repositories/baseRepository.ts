@@ -1,4 +1,4 @@
-import { Model, UpdateQuery, HydratedDocument  } from 'mongoose';
+import { Model, UpdateQuery, HydratedDocument } from "mongoose";
 
 type FilterQuery<T> = Partial<Record<keyof T, any>>;
 
@@ -19,21 +19,24 @@ export class BaseRepository<T> {
 
   async create(data: Partial<T>): Promise<HydratedDocument<T>> {
     const created = new this.model(data);
-    return ( await created.save()) as HydratedDocument<T>;
+    return (await created.save()) as HydratedDocument<T>;
   }
 
-  async updateById(id: string, update: UpdateQuery<T>): Promise<HydratedDocument<T> | null> {
-    return await this.model.findByIdAndUpdate(id, update, {new: true}).exec();
+  async updateById(
+    id: string,
+    update: UpdateQuery<T>,
+  ): Promise<HydratedDocument<T> | null> {
+    return await this.model.findByIdAndUpdate(id, update, { new: true }).exec();
   }
 
   async deleteById(id: string): Promise<HydratedDocument<T> | null> {
     return await this.model.findByIdAndDelete(id).exec();
   }
 
-    async findOneAndUpdate(
+  async findOneAndUpdate(
     filter: FilterQuery<T>,
     update: UpdateQuery<T>,
-    options: object = {}
+    options: object = {},
   ): Promise<HydratedDocument<T> | null> {
     return this.model.findOneAndUpdate(filter, update, options).exec();
   }

@@ -1,103 +1,47 @@
 import { useState } from "react";
+import { useFormik } from "formik";
 import { LayoutGrid, Mail, Lock, User, Building } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { validationSchema } from "../utils/validationSchema";
-import * as Yup from "yup";
+import { loginSchema, registerSchema } from "../utils/validationSchema";
 
 const Loginpage = () => {
   const [tab, setTab] = useState("login");
   const navigate = useNavigate();
   const { login, register, loading } = useAuth();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    username: "",
-    shopname: "",
-    password: "",
+  const loginFormik = useFormik({
+    initialValues: { email: "", password: "" },
+    validationSchema: loginSchema,
+    onSubmit: async (values) => {
+      await login(values.email, values.password);
+      navigate("/dashboard");
+    },
   });
 
-  const [errors, setErrors] = useState({
-    email: "",
-    username: "",
-    shopname: "",
-    password: "",
-  });
-
-  const [touched, setTouched] = useState({
-    email: false,
-    username: false,
-    shopname: false,
-    password: false,
-  });
-
-  const validateField = async (name: string, value: string) => {
-    try {
-      const tempObject = { [name]: value };
-      const tempSchema = Yup.object({ [name]: Yup.reach(validationSchema, name) });
-      await tempSchema.validate(tempObject);
-      return "";
-    } catch (error) {
-      return (error as Error).message || "Invalid field";
-    }
-  };
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    if (touched[name as keyof typeof touched]) {
-      const error = await validateField(name, value);
-      setErrors(prev => ({ ...prev, [name]: error }));
-    }
-  };
-
-  const handleBlur = async (name: string) => {
-    setTouched(prev => ({ ...prev, [name]: true }));
-    const error = await validateField(name, formData[name as keyof typeof formData]);
-    setErrors(prev => ({ ...prev, [name]: error }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      if (tab === "login") {
-        const emailSchema = Yup.object({ email: Yup.reach(validationSchema, 'email') });
-        const passwordSchema = Yup.object({ password: Yup.reach(validationSchema, 'password') });
-        await emailSchema.validate({ email: formData.email });
-        await passwordSchema.validate({ password: formData.password });
-      } else {
-        await validationSchema.validate(formData);
-      }
-
-      setErrors({
-        email: "",
-        username: "",
-        shopname: "",
-        password: "",
+  const registerFormik = useFormik({
+    initialValues: { email: "", username: "", shopname: "", password: "" },
+    validationSchema: registerSchema,
+    onSubmit: async (values) => {
+      await register(values);
+      navigate("/otp-verification", {
+        state: { email: values.email, purpose: "register" },
       });
+    },
+  });
 
-      if (tab === "login") {
-        await login(formData.email, formData.password);
-        navigate("/dashboard");
-      } else {
-        await register(formData);
-        navigate("/otp-verification", {
-          state: { email: formData.email, purpose: "register" }
-        });
-      }
-    } catch (error) {
-      if ((error as { path?: string }).path) {
-        const errorPath = (error as { path?: string }).path!;
-        const errorMessage = (error as { message?: string }).message || "Invalid field";
-        setErrors(prev => ({ ...prev, [errorPath]: errorMessage }));
-        setTouched(prev => ({ ...prev, [errorPath]: true }));
-      } else {
-        console.error("Submission error:", error);
-      }
-    }
+  const switchTab = (newTab: string) => {
+    setTab(newTab);
+    loginFormik.resetForm();
+    registerFormik.resetForm();
   };
+
+  const inputClass = (touched: boolean | undefined, error: string | undefined) =>
+    `w-full h-11 pl-10 pr-4 rounded-xl text-sm bg-[#0b0f17] border transition-all duration-200 ${
+      touched && error
+        ? "border-red-500 text-red-400 placeholder-red-400"
+        : "border-[#1f2733] text-gray-200 placeholder-gray-500 focus:border-emerald-500/50"
+    } focus:outline-none focus:ring-2 focus:ring-emerald-500/10`;
 
   return (
     <div className="min-h-screen bg-[#080b12] flex items-center justify-center p-4 relative overflow-hidden">
@@ -139,7 +83,8 @@ const Loginpage = () => {
             ].map(({ key, label }) => (
               <button
                 key={key}
-                onClick={() => setTab(key)}
+                type="button"
+                onClick={() => switchTab(key)}
                 className={`flex-1 h-9 rounded-lg text-xs font-semibold transition-all duration-200 ${
                   tab === key
                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
@@ -150,231 +95,216 @@ const Loginpage = () => {
               </button>
             ))}
           </div>
-          <form onSubmit={handleSubmit}>
-            {tab === "login" ? (
-              <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
-                  Welcome back
-                </h2>
-                <p className="text-sm text-gray-500 mt-1 mb-6">
-                  Sign in to your inventory dashboard
-                </p>
 
-                {/* Email Field */}
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onBlur={() => handleBlur("email")}
-                      type="email"
-                      placeholder="you@example.com"
-                      className={`w-full h-11 pl-10 pr-4 rounded-xl text-sm bg-[#0b0f17] border transition-all duration-200 ${
-                        touched.email && errors.email
-                          ? "border-red-500 text-red-400 placeholder-red-400"
-                          : "border-[#1f2733] text-gray-200 placeholder-gray-500 focus:border-emerald-500/50"
-                      } focus:outline-none focus:ring-2 focus:ring-emerald-500/10`}
-                    />
-                  </div>
-                  {touched.email && errors.email && (
-                    <p className="text-xs text-red-500 mt-1">{errors.email}</p>
-                  )}
+          {/* ── LOGIN FORM ── */}
+          {tab === "login" && (
+            <form onSubmit={loginFormik.handleSubmit} noValidate>
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                Welcome back
+              </h2>
+              <p className="text-sm text-gray-500 mt-1 mb-6">
+                Sign in to your inventory dashboard
+              </p>
+
+              {/* Email */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                  <input
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={loginFormik.values.email}
+                    onChange={loginFormik.handleChange}
+                    onBlur={loginFormik.handleBlur}
+                    className={inputClass(loginFormik.touched.email, loginFormik.errors.email)}
+                  />
                 </div>
-
-                {/* Password Field */}
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      onBlur={() => handleBlur("password")}
-                      type="password"
-                      placeholder="••••••••"
-                      className={`w-full h-11 pl-10 pr-4 rounded-xl text-sm bg-[#0b0f17] border transition-all duration-200 ${
-                        touched.password && errors.password
-                          ? "border-red-500 text-red-400 placeholder-red-400"
-                          : "border-[#1f2733] text-gray-200 placeholder-gray-500 focus:border-emerald-500/50"
-                      } focus:outline-none focus:ring-2 focus:ring-emerald-500/10`}
-                    />
-                  </div>
-                  {touched.password && errors.password && (
-                    <p className="text-xs text-red-500 mt-1">{errors.password}</p>
-                  )}
-                </div>
-
-                <div className="flex justify-end mb-5 mt-1">
-                  <button
-                    type="button"
-                    onClick={() => navigate("/forgot-password")}
-                    className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-11 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Signing in..." : "Sign In"}
-                </button>
-
-                <p className="text-center text-xs text-gray-600 mt-4">
-                  Don't have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => setTab("register")}
-                    className="text-emerald-500 hover:text-emerald-400 font-semibold"
-                  >
-                    Sign up
-                  </button>
-                </p>
+                {loginFormik.touched.email && loginFormik.errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{loginFormik.errors.email}</p>
+                )}
               </div>
-            ) : (
-              <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
-                  Create account
-                </h2>
-                <p className="text-sm text-gray-500 mt-1 mb-6">
-                  Join Stockify to manage your inventory
-                </p>
 
-                {/* Email Field */}
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-                    Email
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onBlur={() => handleBlur("email")}
-                      type="email"
-                      placeholder="you@example.com"
-                      className={`w-full h-11 pl-10 pr-4 rounded-xl text-sm bg-[#0b0f17] border transition-all duration-200 ${
-                        touched.email && errors.email
-                          ? "border-red-500 text-red-400 placeholder-red-400"
-                          : "border-[#1f2733] text-gray-200 placeholder-gray-500 focus:border-emerald-500/50"
-                      } focus:outline-none focus:ring-2 focus:ring-emerald-500/10`}
-                    />
-                  </div>
-                  {touched.email && errors.email && (
-                    <p className="text-xs text-red-500 mt-1">{errors.email}</p>
-                  )}
+              {/* Password */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                  <input
+                    id="login-password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={loginFormik.values.password}
+                    onChange={loginFormik.handleChange}
+                    onBlur={loginFormik.handleBlur}
+                    className={inputClass(loginFormik.touched.password, loginFormik.errors.password)}
+                  />
                 </div>
-
-                {/* Username Field */}
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-                    Name
-                  </label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      onBlur={() => handleBlur("username")}
-                      type="text"
-                      placeholder="Your full name"
-                      className={`w-full h-11 pl-10 pr-4 rounded-xl text-sm bg-[#0b0f17] border transition-all duration-200 ${
-                        touched.username && errors.username
-                          ? "border-red-500 text-red-400 placeholder-red-400"
-                          : "border-[#1f2733] text-gray-200 placeholder-gray-500 focus:border-emerald-500/50"
-                      } focus:outline-none focus:ring-2 focus:ring-emerald-500/10`}
-                    />
-                  </div>
-                  {touched.username && errors.username && (
-                    <p className="text-xs text-red-500 mt-1">{errors.username}</p>
-                  )}
-                </div>
-
-                {/* Shop Name Field */}
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-                    Shop Name
-                  </label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input
-                      name="shopname"
-                      value={formData.shopname}
-                      onChange={handleChange}
-                      onBlur={() => handleBlur("shopname")}
-                      type="text"
-                      placeholder="Your shop name"
-                      className={`w-full h-11 pl-10 pr-4 rounded-xl text-sm bg-[#0b0f17] border transition-all duration-200 ${
-                        touched.shopname && errors.shopname
-                          ? "border-red-500 text-red-400 placeholder-red-400"
-                          : "border-[#1f2733] text-gray-200 placeholder-gray-500 focus:border-emerald-500/50"
-                      } focus:outline-none focus:ring-2 focus:ring-emerald-500/10`}
-                    />
-                  </div>
-                  {touched.shopname && errors.shopname && (
-                    <p className="text-xs text-red-500 mt-1">{errors.shopname}</p>
-                  )}
-                </div>
-
-                {/* Password Field */}
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
-                    <input
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      onBlur={() => handleBlur("password")}
-                      type="password"
-                      placeholder="••••••••"
-                      className={`w-full h-11 pl-10 pr-4 rounded-xl text-sm bg-[#0b0f17] border transition-all duration-200 ${
-                        touched.password && errors.password
-                          ? "border-red-500 text-red-400 placeholder-red-400"
-                          : "border-[#1f2733] text-gray-200 placeholder-gray-500 focus:border-emerald-500/50"
-                      } focus:outline-none focus:ring-2 focus:ring-emerald-500/10`}
-                    />
-                  </div>
-                  {touched.password && errors.password && (
-                    <p className="text-xs text-red-500 mt-1">{errors.password}</p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-11 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Creating account..." : "Create Account"}
-                </button>
-
-                <p className="text-center text-xs text-gray-600 mt-4">
-                  Already have an account?{" "}
-                  <button
-                    type="button"
-                    onClick={() => setTab("login")}
-                    className="text-emerald-500 hover:text-emerald-400 font-semibold"
-                  >
-                    Sign in
-                  </button>
-                </p>
+                {loginFormik.touched.password && loginFormik.errors.password && (
+                  <p className="text-xs text-red-500 mt-1">{loginFormik.errors.password}</p>
+                )}
               </div>
-            )}
-          </form>
+
+              <div className="flex justify-end mb-5 mt-1">
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                  className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || loginFormik.isSubmitting}
+                className="w-full h-11 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading || loginFormik.isSubmitting ? "Signing in..." : "Sign In"}
+              </button>
+
+              <p className="text-center text-xs text-gray-600 mt-4">
+                Don't have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => switchTab("register")}
+                  className="text-emerald-500 hover:text-emerald-400 font-semibold"
+                >
+                  Sign up
+                </button>
+              </p>
+            </form>
+          )}
+
+          {/* ── REGISTER FORM ── */}
+          {tab === "register" && (
+            <form onSubmit={registerFormik.handleSubmit} noValidate>
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                Create account
+              </h2>
+              <p className="text-sm text-gray-500 mt-1 mb-6">
+                Join Stockify to manage your inventory
+              </p>
+
+              {/* Email */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                  <input
+                    id="register-email"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={registerFormik.values.email}
+                    onChange={registerFormik.handleChange}
+                    onBlur={registerFormik.handleBlur}
+                    className={inputClass(registerFormik.touched.email, registerFormik.errors.email)}
+                  />
+                </div>
+                {registerFormik.touched.email && registerFormik.errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{registerFormik.errors.email}</p>
+                )}
+              </div>
+
+              {/* Username */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
+                  Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                  <input
+                    id="register-username"
+                    name="username"
+                    type="text"
+                    placeholder="Your full name"
+                    value={registerFormik.values.username}
+                    onChange={registerFormik.handleChange}
+                    onBlur={registerFormik.handleBlur}
+                    className={inputClass(registerFormik.touched.username, registerFormik.errors.username)}
+                  />
+                </div>
+                {registerFormik.touched.username && registerFormik.errors.username && (
+                  <p className="text-xs text-red-500 mt-1">{registerFormik.errors.username}</p>
+                )}
+              </div>
+
+              {/* Shop Name */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
+                  Shop Name
+                </label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                  <input
+                    id="register-shopname"
+                    name="shopname"
+                    type="text"
+                    placeholder="Your shop name"
+                    value={registerFormik.values.shopname}
+                    onChange={registerFormik.handleChange}
+                    onBlur={registerFormik.handleBlur}
+                    className={inputClass(registerFormik.touched.shopname, registerFormik.errors.shopname)}
+                  />
+                </div>
+                {registerFormik.touched.shopname && registerFormik.errors.shopname && (
+                  <p className="text-xs text-red-500 mt-1">{registerFormik.errors.shopname}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 pointer-events-none" />
+                  <input
+                    id="register-password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={registerFormik.values.password}
+                    onChange={registerFormik.handleChange}
+                    onBlur={registerFormik.handleBlur}
+                    className={inputClass(registerFormik.touched.password, registerFormik.errors.password)}
+                  />
+                </div>
+                {registerFormik.touched.password && registerFormik.errors.password && (
+                  <p className="text-xs text-red-500 mt-1">{registerFormik.errors.password}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || registerFormik.isSubmitting}
+                className="w-full h-11 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading || registerFormik.isSubmitting ? "Creating account..." : "Create Account"}
+              </button>
+
+              <p className="text-center text-xs text-gray-600 mt-4">
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => switchTab("login")}
+                  className="text-emerald-500 hover:text-emerald-400 font-semibold"
+                >
+                  Sign in
+                </button>
+              </p>
+            </form>
+          )}
         </div>
 
         <p className="text-center text-[11px] text-gray-700 mt-5">
@@ -383,7 +313,6 @@ const Loginpage = () => {
       </div>
     </div>
   );
-}
-
+};
 
 export default Loginpage;
