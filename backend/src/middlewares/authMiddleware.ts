@@ -20,9 +20,9 @@ const authMiddleware = () => {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'User not found' });
       }
 
-      (req as any).userId = user._id;
+      req.userId = user._id.toString();
       next();
-    } catch (error: any) {
+    } catch (error) {
       return res.status(HttpStatus.UNAUTHORIZED).json({ message: 'Invalid or expired token' });
     }
   };

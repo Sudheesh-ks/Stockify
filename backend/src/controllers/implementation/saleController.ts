@@ -11,7 +11,11 @@ export class SaleController implements ISaleController {
   async recordSale(req: Request, res: Response): Promise<void> {
     try {
       const { items, customerName, date } = req.body;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const sale = await this._saleService.recordSale(userId, items, customerName, date ? new Date(date) : undefined);
       sendResponse(res, HttpStatus.CREATED, true, HttpResponse.CREATED, sale);
     } catch (error) {
@@ -28,7 +32,11 @@ export class SaleController implements ISaleController {
 
   async getSales(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
       const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
       const productId = req.query.productId as string | undefined;
@@ -57,7 +65,11 @@ export class SaleController implements ISaleController {
 
   async getSalesByCustomer(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const customerName = req.params.name as string;
       const result = await this._saleService.getSalesByCustomer(userId, customerName);
       sendResponse(res, HttpStatus.OK, true, HttpResponse.OK, result);
@@ -75,7 +87,11 @@ export class SaleController implements ISaleController {
 
   async getItemsReport(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const result = await this._saleService.getItemsReport(userId, page, limit);
@@ -94,7 +110,11 @@ export class SaleController implements ISaleController {
 
   async getCustomerLedger(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const result = await this._saleService.getCustomerLedger(userId, page, limit);
@@ -113,7 +133,11 @@ export class SaleController implements ISaleController {
 
   async deleteSale(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const id = req.params.id as string;
       await this._saleService.deleteSale(userId, id);
       sendResponse(res, HttpStatus.OK, true, 'Sale deleted successfully', null);

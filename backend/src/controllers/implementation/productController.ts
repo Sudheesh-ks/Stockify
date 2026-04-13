@@ -11,7 +11,11 @@ export class ProductController implements IProductController {
   async createProduct(req: Request, res: Response): Promise<void> {
     try {
       const { name, description, quantity, price } = req.body;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const product = await this._productService.createProduct(userId, {
         name,
         description,
@@ -35,7 +39,11 @@ export class ProductController implements IProductController {
     try {
       const { name, description, quantity, price } = req.body;
       const id = req.params.id as string;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const product = await this._productService.updateProduct(id, userId, {
         name,
         description,
@@ -58,7 +66,11 @@ export class ProductController implements IProductController {
   async deleteProduct(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id as string;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const product = await this._productService.deleteProduct(id, userId);
       sendResponse(res, HttpStatus.OK, true, HttpResponse.PRODUCT_DELETED, product);
     } catch (error) {
@@ -76,7 +88,11 @@ export class ProductController implements IProductController {
   async getProduct(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id as string;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const product = await this._productService.getProduct(id, userId);
       sendResponse(res, HttpStatus.OK, true, HttpResponse.PRODUCT_FOUND, product);
     } catch (error) {
@@ -94,7 +110,11 @@ export class ProductController implements IProductController {
   async getAllProducts(req: Request, res: Response): Promise<void> {
     try {
       const search = req.query.search as string | undefined;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 5;
 

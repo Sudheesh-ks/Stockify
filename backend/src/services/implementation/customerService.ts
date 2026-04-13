@@ -12,7 +12,7 @@ export class CustomerService implements ICustomerService {
   ): Promise<CustomerDTO> {
     const created = await this._customerRepository.createCustomer({
       ...customer,
-      userId: userId as any,
+      userId: userId,
     });
     return toCustomerDTO(created);
   }

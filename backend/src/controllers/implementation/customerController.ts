@@ -11,7 +11,11 @@ export class CustomerController implements ICustomerController {
   async createCustomer(req: Request, res: Response): Promise<void> {
     try {
       const { name, address, mobile } = req.body;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const customer = await this._customerService.createCustomer(userId, {
         name,
         address,
@@ -27,7 +31,11 @@ export class CustomerController implements ICustomerController {
     try {
       const { name, address, mobile } = req.body;
       const id = req.params.id as string;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const customer = await this._customerService.updateCustomer(id, userId, {
         name,
         address,
@@ -42,7 +50,11 @@ export class CustomerController implements ICustomerController {
   async deleteCustomer(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id as string;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const customer = await this._customerService.deleteCustomer(id, userId);
       sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_DELETED, customer);
     } catch (error) {
@@ -53,7 +65,11 @@ export class CustomerController implements ICustomerController {
   async getCustomer(req: Request, res: Response): Promise<void> {
     try {
       const id = req.params.id as string;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const customer = await this._customerService.getCustomer(id, userId);
       sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_FOUND, customer);
     } catch (error) {
@@ -64,7 +80,11 @@ export class CustomerController implements ICustomerController {
   async getAllCustomers(req: Request, res: Response): Promise<void> {
     try {
       const search = req.query.search as string | undefined;
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 5;
       const result = await this._customerService.getAllCustomers(userId, search, page, limit);

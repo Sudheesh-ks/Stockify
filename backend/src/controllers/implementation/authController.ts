@@ -48,7 +48,7 @@ export class AuthController implements IAuthController {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-          maxAge: refreshTokenMaxAge, 
+          maxAge: refreshTokenMaxAge,
         });
 
         sendResponse(res, HttpStatus.OK, true, HttpResponse.REGISTER_SUCCESS, {
@@ -169,8 +169,8 @@ export class AuthController implements IAuthController {
         accessToken: newAccessToken,
         user: user,
       });
-    } catch (error: any) {
-      sendResponse(res, HttpStatus.UNAUTHORIZED, false, error.message, null, error);
+    } catch (error) {
+      sendResponse(res, HttpStatus.UNAUTHORIZED, false, (error as Error).message, null, error);
     }
   }
 }

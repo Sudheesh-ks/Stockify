@@ -30,6 +30,7 @@ export const HttpResponse = {
 
   // User related
   USER_NOT_FOUND: 'User not found',
+  USER_ID_MISSING: 'User ID is missing from request',
 
   // OTP
   OTP_SENT: 'OTP sent to email',

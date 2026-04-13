@@ -10,7 +10,11 @@ export class DashboardController implements IDashboardController {
 
   async getDashboardStats(req: Request, res: Response): Promise<void> {
     try {
-      const userId = (req as any).userId;
+      const userId = req.userId;
+      if (!userId) {
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_ID_MISSING);
+        return;
+      }
       const stats = await this._dashboardService.getDashboardStats(userId);
       sendResponse(res, HttpStatus.OK, true, 'Dashboard stats retrieved successfully', stats);
     } catch (error) {
