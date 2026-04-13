@@ -1,4 +1,4 @@
-import { SaleDTO } from "../../dtos/sale.dto";
+import { SaleDTO } from '../../dtos/sale.dto';
 
 export interface ISaleService {
   recordSale(

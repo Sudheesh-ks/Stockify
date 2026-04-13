@@ -1,17 +1,13 @@
-import { userApi } from "../axios/axiosInstance";
-import type { ProductTypes } from "../types/product";
-import { PRODUCT_API } from "../constants/apiConstants";
+import { userApi } from '../axios/axiosInstance';
+import type { ProductTypes } from '../types/product';
+import { PRODUCT_API } from '../constants/apiConstants';
 
 export const createProductAPI = async (data: ProductTypes) => {
   const res = await userApi.post(PRODUCT_API.CREATE, data);
   return res.data.data;
 };
 
-export const getAllProductsAPI = async (
-  search?: string,
-  page?: number,
-  limit?: number,
-) => {
+export const getAllProductsAPI = async (search?: string, page?: number, limit?: number) => {
   const res = await userApi.get(PRODUCT_API.GET_ALL, {
     params: { search, page, limit },
   });

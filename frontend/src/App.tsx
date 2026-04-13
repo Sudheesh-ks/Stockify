@@ -1,5 +1,5 @@
-import { Toaster } from "react-hot-toast";
-import UserRoutes from "./routes/routes";
+import { Toaster } from 'react-hot-toast';
+import UserRoutes from './routes/routes';
 
 function App() {
   return (

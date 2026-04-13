@@ -6,7 +6,9 @@ const DashboardTable = ({ title, headers, data }: any) => (
       <thead>
         <tr className="text-gray-500 border-b border-[#1f2733]">
           {headers.map((h: string, i: number) => (
-            <th key={i} className="pb-2">{h}</th>
+            <th key={i} className="pb-2">
+              {h}
+            </th>
           ))}
         </tr>
       </thead>
@@ -15,7 +17,9 @@ const DashboardTable = ({ title, headers, data }: any) => (
         {data.map((row: any, i: number) => (
           <tr key={i} className="border-b border-[#1f2733] last:border-none">
             {row.map((cell: any, j: number) => (
-              <td key={j} className="py-2 text-gray-300">{cell}</td>
+              <td key={j} className="py-2 text-gray-300">
+                {cell}
+              </td>
             ))}
           </tr>
         ))}

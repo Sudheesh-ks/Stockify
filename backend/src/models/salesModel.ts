@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface SaleItem {
   productId: Types.ObjectId;
@@ -18,14 +18,14 @@ const saleSchema: Schema<SaleDocument> = new Schema<SaleDocument>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "users",
+      ref: 'users',
       required: true,
     },
     items: [
       {
         productId: {
           type: Schema.Types.ObjectId,
-          ref: "products",
+          ref: 'products',
           required: true,
         },
         quantity: {
@@ -47,7 +47,7 @@ const saleSchema: Schema<SaleDocument> = new Schema<SaleDocument>(
     },
     customerName: {
       type: String,
-      default: "Cash",
+      default: 'Cash',
     },
     date: {
       type: Date,
@@ -59,6 +59,6 @@ const saleSchema: Schema<SaleDocument> = new Schema<SaleDocument>(
   },
 );
 
-const salesModel = mongoose.model<SaleDocument>("sales", saleSchema);
+const salesModel = mongoose.model<SaleDocument>('sales', saleSchema);
 
 export default salesModel;

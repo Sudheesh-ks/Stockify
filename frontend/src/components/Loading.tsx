@@ -6,11 +6,7 @@ interface LoadingProps {
   className?: string;
 }
 
-const Loading: React.FC<LoadingProps> = ({ 
-  fullPage = false, 
-  message,
-  className = ""
-}) => {
+const Loading: React.FC<LoadingProps> = ({ fullPage = false, message, className = '' }) => {
   if (fullPage) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#080b12]">
@@ -23,7 +19,9 @@ const Loading: React.FC<LoadingProps> = ({
   }
 
   return (
-    <div className={`flex flex-col justify-center items-center h-64 bg-[#0d1117] rounded-xl border border-[#1a1f2a] ${className}`}>
+    <div
+      className={`flex flex-col justify-center items-center h-64 bg-[#0d1117] rounded-xl border border-[#1a1f2a] ${className}`}
+    >
       <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-emerald-500"></div>
       {message && <p className="text-gray-400 mt-4 font-medium animate-pulse">{message}</p>}
     </div>

@@ -1,44 +1,33 @@
-import customerModel, { CustomerDocument } from "../../models/customerModel";
-import { BaseRepository } from "../baseRepository";
-import { ICustomerRepository } from "../interface/ICustomerRepository";
+import customerModel, { CustomerDocument } from '../../models/customerModel';
+import { BaseRepository } from '../baseRepository';
+import { ICustomerRepository } from '../interface/ICustomerRepository';
 
-export class CustomerRepository
-  extends BaseRepository<CustomerDocument>
-  implements ICustomerRepository
-{
+export class CustomerRepository extends BaseRepository<CustomerDocument> implements ICustomerRepository {
   constructor() {
     super(customerModel);
   }
 
-  async createCustomer(
-    customer: Partial<CustomerDocument>,
-  ): Promise<CustomerDocument> {
+  async createCustomer(customer: Partial<CustomerDocument>): Promise<CustomerDocument> {
     return this.create(customer);
   }
 
-  async updateCustomer(
-    id: string,
-    userId: string,
-    customer: Partial<CustomerDocument>,
-  ): Promise<CustomerDocument> {
+  async updateCustomer(id: string, userId: string, customer: Partial<CustomerDocument>): Promise<CustomerDocument> {
     const updated = await this.findOneAndUpdate({ _id: id, userId }, customer, {
       new: true,
     });
-    if (!updated) throw new Error("Customer not found or unauthorized");
+    if (!updated) throw new Error('Customer not found or unauthorized');
     return updated;
   }
 
   async deleteCustomer(id: string, userId: string): Promise<CustomerDocument> {
-    const deleted = await this.model
-      .findOneAndDelete({ _id: id, userId })
-      .exec();
-    if (!deleted) throw new Error("Customer not found or unauthorized");
+    const deleted = await this.model.findOneAndDelete({ _id: id, userId }).exec();
+    if (!deleted) throw new Error('Customer not found or unauthorized');
     return deleted;
   }
 
   async getCustomer(id: string, userId: string): Promise<CustomerDocument> {
     const customer = await this.findOne({ _id: id, userId });
-    if (!customer) throw new Error("Customer not found or unauthorized");
+    if (!customer) throw new Error('Customer not found or unauthorized');
     return customer;
   }
 
@@ -55,9 +44,9 @@ export class CustomerRepository
         { userId },
         {
           $or: [
-            { name: { $regex: search, $options: "i" } },
-            { address: { $regex: search, $options: "i" } },
-            { mobile: { $regex: search, $options: "i" } },
+            { name: { $regex: search, $options: 'i' } },
+            { address: { $regex: search, $options: 'i' } },
+            { mobile: { $regex: search, $options: 'i' } },
           ],
         },
       ];

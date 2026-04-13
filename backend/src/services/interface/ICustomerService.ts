@@ -1,10 +1,7 @@
-import { CustomerDTO } from "../../dtos/customer.dto";
+import { CustomerDTO } from '../../dtos/customer.dto';
 
 export interface ICustomerService {
-  createCustomer(
-    userId: string,
-    customer: { name: string; address: string; mobile: string },
-  ): Promise<CustomerDTO>;
+  createCustomer(userId: string, customer: { name: string; address: string; mobile: string }): Promise<CustomerDTO>;
   updateCustomer(
     id: string,
     userId: string,

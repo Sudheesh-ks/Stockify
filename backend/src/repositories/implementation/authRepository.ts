@@ -1,11 +1,8 @@
-import userModel, { userDocument } from "../../models/userModel";
-import { BaseRepository } from "../baseRepository";
-import { IAuthRepository } from "../interface/IAuthRepository";
+import userModel, { userDocument } from '../../models/userModel';
+import { BaseRepository } from '../baseRepository';
+import { IAuthRepository } from '../interface/IAuthRepository';
 
-export class AuthRepository
-  extends BaseRepository<userDocument>
-  implements IAuthRepository
-{
+export class AuthRepository extends BaseRepository<userDocument> implements IAuthRepository {
   constructor() {
     super(userModel);
   }
@@ -24,14 +21,8 @@ export class AuthRepository
     return this.findOne({ email });
   }
 
-  async updatePasswordByEmail(
-    email: string,
-    newHashedPassword: string,
-  ): Promise<boolean> {
-    const updatedUser = await userModel.findOneAndUpdate(
-      { email },
-      { $set: { password: newHashedPassword } },
-    );
+  async updatePasswordByEmail(email: string, newHashedPassword: string): Promise<boolean> {
+    const updatedUser = await userModel.findOneAndUpdate({ email }, { $set: { password: newHashedPassword } });
     return !!updatedUser;
   }
 }

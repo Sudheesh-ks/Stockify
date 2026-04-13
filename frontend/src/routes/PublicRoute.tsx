@@ -1,8 +1,8 @@
-import { Navigate } from "react-router-dom";
-import { type ReactNode, useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { Navigate } from 'react-router-dom';
+import { type ReactNode, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth';
 
-import Loading from "../components/Loading";
+import Loading from '../components/Loading';
 
 interface PublicRouteProps {
   children: ReactNode;

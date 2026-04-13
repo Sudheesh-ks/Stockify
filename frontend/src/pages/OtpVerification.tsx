@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutGrid } from "lucide-react";
-import toast from "react-hot-toast";
-import { resendOtpAPI } from "../services/authServices";
-import { showErrorToast } from "../utils/errorHandler";
-import { useAuth } from "../hooks/useAuth";
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { LayoutGrid } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { resendOtpAPI } from '../services/authServices';
+import { showErrorToast } from '../utils/errorHandler';
+import { useAuth } from '../hooks/useAuth';
 
 const OTPVerification = () => {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ const OTPVerification = () => {
 
   const { email, purpose } = location.state || {};
 
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [timer, setTimer] = useState(60);
   const { verifyOtp, loading } = useAuth();
 
@@ -43,41 +43,40 @@ const OTPVerification = () => {
 
   // Verify OTP
   const handleVerify = async () => {
-    const enteredOtp = otp.join("");
+    const enteredOtp = otp.join('');
 
     if (enteredOtp.length !== 4) {
-      toast.error("Enter complete OTP");
+      toast.error('Enter complete OTP');
       return;
     }
 
     if (!email || !purpose) {
-      toast.error("Missing required data. Please retry from login/register.");
+      toast.error('Missing required data. Please retry from login/register.');
       return;
     }
 
     try {
       const res = await verifyOtp(email, enteredOtp, purpose);
-      console.log("OTP verify response:", res);
+      console.log('OTP verify response:', res);
 
       if (res.success) {
-        toast.success("OTP verified successfully!");
+        toast.success('OTP verified successfully!');
 
         const purposeValue = res.data?.purpose || purpose;
 
-        if (purposeValue === "register") {
-          navigate("/dashboard");
+        if (purposeValue === 'register') {
+          navigate('/dashboard');
           return;
         }
 
-        if (purposeValue === "reset-password") {
-          navigate("/reset-password", { state: { email } });
+        if (purposeValue === 'reset-password') {
+          navigate('/reset-password', { state: { email } });
           return;
         }
 
-        console.warn("Unknown OTP purpose:", purposeValue);
+        console.warn('Unknown OTP purpose:', purposeValue);
         return;
       }
-
     } catch (err) {
       console.error(err);
     }
@@ -89,10 +88,10 @@ const OTPVerification = () => {
       const res = await resendOtpAPI(email, purpose);
 
       if (res.success) {
-      setTimer(60);
-      toast.success("OTP resent");
-      }else{
-        toast.error("Failed to resend OTP");
+        setTimer(60);
+        toast.success('OTP resent');
+      } else {
+        toast.error('Failed to resend OTP');
       }
     } catch (err) {
       showErrorToast(err);
@@ -112,13 +111,9 @@ const OTPVerification = () => {
         </div>
 
         <div className="rounded-2xl border bg-[#0d1117] p-7">
-          <h2 className="text-2xl font-bold text-white">
-            Verify OTP
-          </h2>
+          <h2 className="text-2xl font-bold text-white">Verify OTP</h2>
 
-          <p className="text-sm text-gray-400 mt-1 mb-6">
-            Enter the 4-digit code sent to your email
-          </p>
+          <p className="text-sm text-gray-400 mt-1 mb-6">Enter the 4-digit code sent to your email</p>
 
           {/* OTP inputs */}
           <div className="flex justify-between gap-3 mb-6">
@@ -140,7 +135,7 @@ const OTPVerification = () => {
             disabled={loading}
             className="w-full h-11 rounded-xl text-white bg-emerald-600"
           >
-            {loading ? "Verifying..." : "Verify"}
+            {loading ? 'Verifying...' : 'Verify'}
           </button>
 
           {/* Timer */}
@@ -148,10 +143,7 @@ const OTPVerification = () => {
             {timer > 0 ? (
               <>Resend in {timer}s</>
             ) : (
-              <button
-                onClick={handleResend}
-                className="text-emerald-400"
-              >
+              <button onClick={handleResend} className="text-emerald-400">
                 Resend OTP
               </button>
             )}

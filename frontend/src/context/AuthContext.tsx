@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsAuthenticated(true);
         }
       } catch (err) {
-        console.log("Initial session refresh failed:", err);
+        console.log('Initial session refresh failed:', err);
         // If we were expecting to be logged in but refresh failed, clear state
         if (localStorage.getItem('token')) {
           setToken(null);

@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
-import { IDashboardController } from "../interface/IDashboardController";
-import { IDashboardService } from "../../services/interface/IDashboardService";
-import { sendResponse } from "../../utils/apiResponse.util";
-import { HttpStatus } from "../../constants/status.constants";
-import { HttpResponse } from "../../constants/responseMessage.constants";
+import { Request, Response } from 'express';
+import { IDashboardController } from '../interface/IDashboardController';
+import { IDashboardService } from '../../services/interface/IDashboardService';
+import { sendResponse } from '../../utils/apiResponse.util';
+import { HttpStatus } from '../../constants/status.constants';
+import { HttpResponse } from '../../constants/responseMessage.constants';
 
 export class DashboardController implements IDashboardController {
   constructor(private readonly _dashboardService: IDashboardService) {}
@@ -12,13 +12,7 @@ export class DashboardController implements IDashboardController {
     try {
       const userId = (req as any).userId;
       const stats = await this._dashboardService.getDashboardStats(userId);
-      sendResponse(
-        res,
-        HttpStatus.OK,
-        true,
-        "Dashboard stats retrieved successfully",
-        stats,
-      );
+      sendResponse(res, HttpStatus.OK, true, 'Dashboard stats retrieved successfully', stats);
     } catch (error) {
       sendResponse(
         res,

@@ -1,6 +1,6 @@
-import { DashboardController } from "../controllers/implementation/dashboardController";
-import { DashboardRepository } from "../repositories/implementation/dashboardRepository";
-import { DashboardService } from "../services/implementation/dashboardService";
+import { DashboardController } from '../controllers/implementation/dashboardController';
+import { DashboardRepository } from '../repositories/implementation/dashboardRepository';
+import { DashboardService } from '../services/implementation/dashboardService';
 
 const dashboardRepository = new DashboardRepository();
 const dashboardService = new DashboardService(dashboardRepository);

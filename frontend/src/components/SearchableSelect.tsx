@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Search, Loader2, ChevronDown, Check } from "lucide-react";
-import type { Option, SearchableSelectProps } from "../types/searchableSelect";
-
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Loader2, ChevronDown, Check } from 'lucide-react';
+import type { Option, SearchableSelectProps } from '../types/searchableSelect';
 
 const SearchableSelect: React.FC<SearchableSelectProps> = ({
   onSearch,
   onSelect,
-  placeholder = "Search...",
+  placeholder = 'Search...',
   label,
-  defaultValue = "",
+  defaultValue = '',
   error,
   touched,
-  allowCustom = false
+  allowCustom = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(defaultValue);
@@ -28,12 +27,12 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         const results = await onSearch(query);
         setOptions(results);
       } catch (error) {
-        console.error("Search error:", error);
+        console.error('Search error:', error);
       } finally {
         setIsLoading(false);
       }
     },
-    [onSearch]
+    [onSearch],
   );
 
   useEffect(() => {
@@ -52,8 +51,8 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSelect = (option: Option) => {
@@ -65,23 +64,23 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isOpen) {
-      if (e.key === "ArrowDown" || e.key === "Enter") setIsOpen(true);
+      if (e.key === 'ArrowDown' || e.key === 'Enter') setIsOpen(true);
       return;
     }
 
     switch (e.key) {
-      case "ArrowDown":
+      case 'ArrowDown':
         setSelectedIndex((prev) => (prev < options.length - 1 ? prev + 1 : prev));
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
         break;
-      case "Enter":
+      case 'Enter':
         if (selectedIndex >= 0 && options[selectedIndex]) {
           handleSelect(options[selectedIndex]);
         }
         break;
-      case "Escape":
+      case 'Escape':
         setIsOpen(false);
         break;
     }
@@ -90,15 +89,15 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
   return (
     <div className="relative w-full" ref={containerRef}>
       {label && <label className="block text-sm font-medium text-gray-400 mb-1">{label}</label>}
-      
+
       <div className="relative group">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 group-focus-within:text-emerald-400 transition-colors">
           {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
         </div>
-        
+
         <input
           type="text"
-          className={`w-full bg-[#151b23] border ${error && touched ? "border-red-500" : "border-[#1a1f2a]"} pl-10 pr-10 py-2.5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-medium`}
+          className={`w-full bg-[#151b23] border ${error && touched ? 'border-red-500' : 'border-[#1a1f2a]'} pl-10 pr-10 py-2.5 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all font-medium`}
           placeholder={placeholder}
           value={searchTerm}
           onFocus={() => setIsOpen(true)}
@@ -108,7 +107,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
             setIsOpen(true);
             if (allowCustom) {
               onSelect({ value: val, label: val });
-            } else if (val === "") {
+            } else if (val === '') {
               onSelect(null);
             }
           }}
@@ -116,7 +115,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
         />
 
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-500">
-          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </div>
       </div>
 
@@ -130,7 +129,9 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 <div
                   key={option.value}
                   className={`px-4 py-3 flex items-center justify-between cursor-pointer transition-colors ${
-                    selectedIndex === index ? "bg-emerald-500/10 text-white" : "text-gray-300 hover:bg-[#1a1f2a] hover:text-white"
+                    selectedIndex === index
+                      ? 'bg-emerald-500/10 text-white'
+                      : 'text-gray-300 hover:bg-[#1a1f2a] hover:text-white'
                   }`}
                   onClick={() => handleSelect(option)}
                   onMouseEnter={() => setSelectedIndex(index)}
@@ -144,7 +145,7 @@ const SearchableSelect: React.FC<SearchableSelectProps> = ({
               ))
             ) : (
               <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                {isLoading ? "Searching inventory..." : "No results found"}
+                {isLoading ? 'Searching inventory...' : 'No results found'}
               </div>
             )}
           </div>

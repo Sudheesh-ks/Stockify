@@ -1,5 +1,5 @@
-import { Mail, Lock } from "lucide-react";
-import InputField from "./InputField";
+import { Mail, Lock } from 'lucide-react';
+import InputField from './InputField';
 
 type LoginFormProps = {
   onSwitch: (mode?: string) => void;
@@ -13,12 +13,8 @@ type LoginFormProps = {
 
 const LoginForm = ({ onSwitch, formData, errors, touched, onChange, onBlur, loading }: LoginFormProps) => (
   <div>
-    <h2 className="text-2xl font-bold text-white tracking-tight">
-      Welcome back
-    </h2>
-    <p className="text-sm text-gray-500 mt-1 mb-6">
-      Sign in to your inventory dashboard
-    </p>
+    <h2 className="text-2xl font-bold text-white tracking-tight">Welcome back</h2>
+    <p className="text-sm text-gray-500 mt-1 mb-6">Sign in to your inventory dashboard</p>
 
     <InputField
       label="Email"
@@ -47,21 +43,25 @@ const LoginForm = ({ onSwitch, formData, errors, touched, onChange, onBlur, load
 
     <div className="flex justify-end mb-5 mt-1">
       <button
-        onClick={() => onSwitch("forgot")}
+        onClick={() => onSwitch('forgot')}
         className="text-xs font-semibold text-emerald-500 hover:text-emerald-400 transition-colors"
       >
         Forgot password?
       </button>
     </div>
 
-    <button type="submit" disabled={loading} className="w-full h-11 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 active:scale-[0.98] transition-all duration-150 shadow-lg shadow-emerald-900/50">
-      {loading ? "Signing in..." : "Sign In"}
+    <button
+      type="submit"
+      disabled={loading}
+      className="w-full h-11 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 active:scale-[0.98] transition-all duration-150 shadow-lg shadow-emerald-900/50"
+    >
+      {loading ? 'Signing in...' : 'Sign In'}
     </button>
 
     <p className="text-center text-xs text-gray-600 mt-5">
-      Don't have an account?{" "}
+      Don't have an account?{' '}
       <button
-        onClick={() => onSwitch("register")}
+        onClick={() => onSwitch('register')}
         className="text-emerald-500 font-semibold hover:text-emerald-400 transition-colors"
       >
         Create one

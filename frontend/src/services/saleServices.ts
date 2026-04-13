@@ -1,5 +1,5 @@
-import { userApi } from "../axios/axiosInstance";
-import { SALE_API } from "../constants/apiConstants";
+import { userApi } from '../axios/axiosInstance';
+import { SALE_API } from '../constants/apiConstants';
 
 export interface SaleFilters {
   startDate?: string;
@@ -29,20 +29,14 @@ export const getSalesByCustomerAPI = async (name: string) => {
   return res.data.data;
 };
 
-export const getItemsReportAPI = async (
-  page: number = 1,
-  limit: number = 10,
-) => {
+export const getItemsReportAPI = async (page: number = 1, limit: number = 10) => {
   const res = await userApi.get(SALE_API.GET_ITEMS_REPORT, {
     params: { page, limit },
   });
   return res.data.data;
 };
 
-export const getCustomerLedgerAPI = async (
-  page: number = 1,
-  limit: number = 10,
-) => {
+export const getCustomerLedgerAPI = async (page: number = 1, limit: number = 10) => {
   const res = await userApi.get(SALE_API.GET_LEDGER_REPORT, {
     params: { page, limit },
   });

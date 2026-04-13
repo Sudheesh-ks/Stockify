@@ -1,7 +1,7 @@
-import { CustomerDTO } from "../../dtos/customer.dto";
-import { toCustomerDTO } from "../../mappers/customer.mapper";
-import { CustomerRepository } from "../../repositories/implementation/customerRepository";
-import { ICustomerService } from "../interface/ICustomerService";
+import { CustomerDTO } from '../../dtos/customer.dto';
+import { toCustomerDTO } from '../../mappers/customer.mapper';
+import { CustomerRepository } from '../../repositories/implementation/customerRepository';
+import { ICustomerService } from '../interface/ICustomerService';
 
 export class CustomerService implements ICustomerService {
   constructor(private readonly _customerRepository: CustomerRepository) {}
@@ -22,11 +22,7 @@ export class CustomerService implements ICustomerService {
     userId: string,
     customer: { name?: string; address?: string; mobile?: string },
   ): Promise<CustomerDTO> {
-    const updated = await this._customerRepository.updateCustomer(
-      id,
-      userId,
-      customer,
-    );
+    const updated = await this._customerRepository.updateCustomer(id, userId, customer);
     return toCustomerDTO(updated);
   }
 
@@ -51,13 +47,7 @@ export class CustomerService implements ICustomerService {
     totalPages: number;
     currentPage: number;
   }> {
-    const { customers, totalCount } =
-      await this._customerRepository.getAllCustomers(
-        userId,
-        search,
-        page,
-        limit,
-      );
+    const { customers, totalCount } = await this._customerRepository.getAllCustomers(userId, search, page, limit);
     const effectiveLimit = limit && limit > 0 ? limit : 10;
     const totalPages = Math.max(1, Math.ceil(totalCount / effectiveLimit));
 

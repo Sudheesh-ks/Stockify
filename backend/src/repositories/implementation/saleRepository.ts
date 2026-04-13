@@ -1,20 +1,14 @@
-import mongoose from "mongoose";
-import salesModel, { SaleDocument } from "../../models/salesModel";
-import { BaseRepository } from "../baseRepository";
-import { ISaleRepository } from "../interface/ISaleRepository";
+import mongoose from 'mongoose';
+import salesModel, { SaleDocument } from '../../models/salesModel';
+import { BaseRepository } from '../baseRepository';
+import { ISaleRepository } from '../interface/ISaleRepository';
 
-export class SaleRepository
-  extends BaseRepository<SaleDocument>
-  implements ISaleRepository
-{
+export class SaleRepository extends BaseRepository<SaleDocument> implements ISaleRepository {
   constructor() {
     super(salesModel);
   }
 
-  async createSale(
-    userId: string,
-    sale: Partial<SaleDocument>,
-  ): Promise<SaleDocument> {
+  async createSale(userId: string, sale: Partial<SaleDocument>): Promise<SaleDocument> {
     return this.create({ ...sale, userId: userId as any });
   }
 
@@ -32,23 +26,20 @@ export class SaleRepository
       .sort({ date: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .populate("items.productId")
+      .populate('items.productId')
       .exec();
 
     return { sales, totalCount };
   }
 
-  async getSalesByCustomer(
-    userId: string,
-    customerName: string,
-  ): Promise<SaleDocument[]> {
+  async getSalesByCustomer(userId: string, customerName: string): Promise<SaleDocument[]> {
     return this.model
       .find({
         userId,
-        customerName: { $regex: customerName, $options: "i" },
+        customerName: { $regex: customerName, $options: 'i' },
       })
       .sort({ date: -1 })
-      .populate("items.productId")
+      .populate('items.productId')
       .exec();
   }
 
@@ -58,34 +49,31 @@ export class SaleRepository
     limit: number = 10,
   ): Promise<{ data: any[]; totalCount: number }> {
     const skip = (page - 1) * limit;
-    const results = await mongoose.model("products").aggregate([
+    const results = await mongoose.model('products').aggregate([
       { $match: { userId: new mongoose.Types.ObjectId(userId) } },
       {
         $lookup: {
-          from: "sales",
-          let: { productId: "$_id" },
-          pipeline: [
-            { $unwind: "$items" },
-            { $match: { $expr: { $eq: ["$items.productId", "$$productId"] } } },
-          ],
-          as: "saleItems",
+          from: 'sales',
+          let: { productId: '$_id' },
+          pipeline: [{ $unwind: '$items' }, { $match: { $expr: { $eq: ['$items.productId', '$$productId'] } } }],
+          as: 'saleItems',
         },
       },
       {
         $addFields: {
-          sold: { $sum: "$saleItems.items.quantity" },
+          sold: { $sum: '$saleItems.items.quantity' },
         },
       },
       {
         $project: {
           name: 1,
-          stock: "$quantity",
+          stock: '$quantity',
           sold: 1,
         },
       },
       {
         $facet: {
-          metadata: [{ $count: "total" }],
+          metadata: [{ $count: 'total' }],
           data: [{ $skip: skip }, { $limit: limit }],
         },
       },
@@ -109,37 +97,31 @@ export class SaleRepository
           _id: {
             $cond: [
               {
-                $or: [
-                  { $eq: ["$customerName", ""] },
-                  { $not: ["$customerName"] },
-                ],
+                $or: [{ $eq: ['$customerName', ''] }, { $not: ['$customerName'] }],
               },
-              "User not found",
-              "$customerName",
+              'User not found',
+              '$customerName',
             ],
           },
           name: {
             $first: {
               $cond: [
                 {
-                  $or: [
-                    { $eq: ["$customerName", ""] },
-                    { $not: ["$customerName"] },
-                  ],
+                  $or: [{ $eq: ['$customerName', ''] }, { $not: ['$customerName'] }],
                 },
-                "User not found",
-                "$customerName",
+                'User not found',
+                '$customerName',
               ],
             },
           },
           transactions: { $sum: 1 },
-          totalSpent: { $sum: "$totalAmount" },
+          totalSpent: { $sum: '$totalAmount' },
         },
       },
       { $sort: { totalSpent: -1 } },
       {
         $facet: {
-          metadata: [{ $count: "total" }],
+          metadata: [{ $count: 'total' }],
           data: [{ $skip: skip }, { $limit: limit }],
         },
       },

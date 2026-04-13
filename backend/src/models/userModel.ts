@@ -1,7 +1,7 @@
-import mongoose, { Model, Schema, Types } from "mongoose";
-import { UserTypes } from "../types/user";
+import mongoose, { Model, Schema, Types } from 'mongoose';
+import { UserTypes } from '../types/user';
 
-export interface userDocument extends Omit<UserTypes, "_id">, Document {
+export interface userDocument extends Omit<UserTypes, '_id'>, Document {
   _id: Types.ObjectId;
 }
 
@@ -25,9 +25,6 @@ const userSchema: Schema<userDocument> = new mongoose.Schema({
   },
 });
 
-const userModel: Model<userDocument> = mongoose.model<userDocument>(
-  "User",
-  userSchema,
-);
+const userModel: Model<userDocument> = mongoose.model<userDocument>('User', userSchema);
 
 export default userModel;

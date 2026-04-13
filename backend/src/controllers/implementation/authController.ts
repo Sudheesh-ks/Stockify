@@ -1,15 +1,11 @@
-import { Request, Response } from "express";
-import { HttpStatus } from "../../constants/status.constants";
-import { HttpResponse } from "../../constants/responseMessage.constants";
-import { sendResponse } from "../../utils/apiResponse.util";
-import { AuthPurpose } from "../../constants/authPurpose.constants";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from "../../utils/jwt.util";
-import { IAuthController } from "../interface/IAuthController";
-import { IAuthService } from "../../services/interface/IAuthService";
+import { Request, Response } from 'express';
+import { HttpStatus } from '../../constants/status.constants';
+import { HttpResponse } from '../../constants/responseMessage.constants';
+import { sendResponse } from '../../utils/apiResponse.util';
+import { AuthPurpose } from '../../constants/authPurpose.constants';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../utils/jwt.util';
+import { IAuthController } from '../interface/IAuthController';
+import { IAuthService } from '../../services/interface/IAuthService';
 
 const refreshTokenMaxAge = Number(process.env.REFRESH_TOKEN_MAX_AGE);
 
@@ -45,20 +41,14 @@ export class AuthController implements IAuthController {
       const result = await this._authService.verifyOtp(email, otp, purpose);
 
       if (purpose === AuthPurpose.REGISTER && result.user) {
-        const accessToken = generateAccessToken(
-          result.user._id!,
-          result.user.email,
-        );
-        const refreshToken = generateRefreshToken(
-          result.user._id!,
-          result.user.email,
-        );
+        const accessToken = generateAccessToken(result.user._id!, result.user.email);
+        const refreshToken = generateRefreshToken(result.user._id!, result.user.email);
 
-        res.cookie("refreshToken", refreshToken, {
+        res.cookie('refreshToken', refreshToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-          maxAge: refreshTokenMaxAge, // 7 days
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+          maxAge: refreshTokenMaxAge, 
         });
 
         sendResponse(res, HttpStatus.OK, true, HttpResponse.REGISTER_SUCCESS, {
@@ -75,19 +65,9 @@ export class AuthController implements IAuthController {
         return;
       }
 
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        HttpResponse.BAD_REQUEST,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, HttpResponse.BAD_REQUEST);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message);
     }
   }
 
@@ -119,11 +99,11 @@ export class AuthController implements IAuthController {
       const accessToken = generateAccessToken(user._id!, user.email);
       const refreshToken = generateRefreshToken(user._id!, user.email);
 
-      res.cookie("refreshToken", refreshToken, {
+      res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: refreshTokenMaxAge, // 7 days
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: refreshTokenMaxAge,
       });
 
       sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGIN_SUCCESS, {
@@ -131,14 +111,7 @@ export class AuthController implements IAuthController {
         user,
       });
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 
@@ -149,14 +122,7 @@ export class AuthController implements IAuthController {
       await this._authService.forgotPasswordRequest(email);
       sendResponse(res, HttpStatus.OK, true, HttpResponse.OTP_SENT);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 
@@ -167,22 +133,15 @@ export class AuthController implements IAuthController {
       await this._authService.resetPassword(email, newPassword);
       sendResponse(res, HttpStatus.OK, true, HttpResponse.PASSWORD_UPDATED);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 
   async logoutUser(req: Request, res: Response): Promise<void> {
-    res.clearCookie("refreshToken", {
+    res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGOUT_SUCCESS);
   }
@@ -192,12 +151,7 @@ export class AuthController implements IAuthController {
       const token = req.cookies.refreshToken;
 
       if (!token) {
-        sendResponse(
-          res,
-          HttpStatus.UNAUTHORIZED,
-          false,
-          HttpResponse.REFRESH_TOKEN_MISSING,
-        );
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.REFRESH_TOKEN_MISSING);
         return;
       }
 
@@ -205,12 +159,7 @@ export class AuthController implements IAuthController {
       const user = await this._authService.getUserById(decoded.id);
 
       if (!user) {
-        sendResponse(
-          res,
-          HttpStatus.UNAUTHORIZED,
-          false,
-          HttpResponse.USER_NOT_FOUND,
-        );
+        sendResponse(res, HttpStatus.UNAUTHORIZED, false, HttpResponse.USER_NOT_FOUND);
         return;
       }
 
@@ -221,14 +170,7 @@ export class AuthController implements IAuthController {
         user: user,
       });
     } catch (error: any) {
-      sendResponse(
-        res,
-        HttpStatus.UNAUTHORIZED,
-        false,
-        error.message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.UNAUTHORIZED, false, error.message, null, error);
     }
   }
 }

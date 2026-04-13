@@ -1,28 +1,28 @@
-import { useState, useEffect } from "react";
-import { Plus, Package } from "lucide-react";
-import { toast } from "react-hot-toast";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { useState, useEffect } from 'react';
+import { Plus, Package } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 
 // Layout
-import DashboardLayout from "../layout/DashboardLayout";
+import DashboardLayout from '../layout/DashboardLayout';
 
 // Components
-import SearchBar from "../components/SearchBar";
-import DataTable from "../components/DataTable";
-import type { Column } from "../components/DataTable";
-import Pagination from "../components/Pagination";
-import AddEditModal from "../components/AddEditModal";
-import ConfirmationModal from "../components/ConfirmationModal";
-import type { ProductTypes } from "../types/product";
-import { createProductAPI, deleteProductAPI, getAllProductsAPI, updateProductAPI } from "../services/productServices";
-import { showErrorToast } from "../utils/errorHandler";
-import { ProductSchema } from "../utils/validationSchema";
+import SearchBar from '../components/SearchBar';
+import DataTable from '../components/DataTable';
+import type { Column } from '../components/DataTable';
+import Pagination from '../components/Pagination';
+import AddEditModal from '../components/AddEditModal';
+import ConfirmationModal from '../components/ConfirmationModal';
+import type { ProductTypes } from '../types/product';
+import { createProductAPI, deleteProductAPI, getAllProductsAPI, updateProductAPI } from '../services/productServices';
+import { showErrorToast } from '../utils/errorHandler';
+import { ProductSchema } from '../utils/validationSchema';
 
 const ITEMS_PER_PAGE = 6;
 
 const ProductsPage = () => {
   const [products, setProducts] = useState<ProductTypes[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,19 +33,19 @@ const ProductsPage = () => {
     title: string;
     message: string;
     action: () => void;
-    type: "danger" | "warning";
+    type: 'danger' | 'warning';
   }>({
     isOpen: false,
-    title: "",
-    message: "",
-    action: () => { },
-    type: "warning",
+    title: '',
+    message: '',
+    action: () => {},
+    type: 'warning',
   });
 
   const fetchProducts = async () => {
     try {
       const data = await getAllProductsAPI(searchQuery, currentPage, ITEMS_PER_PAGE);
-      console.log("Fetch Products Result:", data);
+      console.log('Fetch Products Result:', data);
       setProducts(data.products || []);
       setTotalPages(data.totalPages || 1);
     } catch (error) {
@@ -65,10 +65,10 @@ const ProductsPage = () => {
     try {
       if (isUpdate && editingProduct?._id) {
         await updateProductAPI(editingProduct._id, values);
-        toast.success("Product updated successfully");
+        toast.success('Product updated successfully');
       } else {
         await createProductAPI(values);
-        toast.success("Product added successfully");
+        toast.success('Product added successfully');
       }
       fetchProducts();
       setIsModalOpen(false);
@@ -81,9 +81,9 @@ const ProductsPage = () => {
     if (editingProduct) {
       setConfirmConfig({
         isOpen: true,
-        title: "Confirm Update",
+        title: 'Confirm Update',
         message: `Are you sure you want to update "${editingProduct.name}"?`,
-        type: "warning",
+        type: 'warning',
         action: () => executeSave(values, true),
       });
     } else {
@@ -95,13 +95,13 @@ const ProductsPage = () => {
     const productToDelete = products.find((p) => p._id === id);
     setConfirmConfig({
       isOpen: true,
-      title: "Delete Product",
+      title: 'Delete Product',
       message: `Are you sure you want to delete "${productToDelete?.name}"?`,
-      type: "danger",
+      type: 'danger',
       action: async () => {
         try {
           await deleteProductAPI(id);
-          toast.success("Product deleted successfully");
+          toast.success('Product deleted successfully');
           fetchProducts();
         } catch (error) {
           showErrorToast(error);
@@ -111,20 +111,18 @@ const ProductsPage = () => {
   };
 
   const columns: Column<ProductTypes>[] = [
-    { header: "Name", accessor: "name", className: "font-bold text-white" },
-    { header: "Description", accessor: "description", className: "max-w-xs truncate text-gray-400" },
+    { header: 'Name', accessor: 'name', className: 'font-bold text-white' },
+    { header: 'Description', accessor: 'description', className: 'max-w-xs truncate text-gray-400' },
     {
-      header: "Quantity",
+      header: 'Quantity',
       accessor: (p: ProductTypes) => (
-        <span className={p.quantity > 0 ? "text-emerald-400" : "text-red-400"}>
-          {p.quantity} Units
-        </span>
-      )
+        <span className={p.quantity > 0 ? 'text-emerald-400' : 'text-red-400'}>{p.quantity} Units</span>
+      ),
     },
     {
-      header: "Price",
+      header: 'Price',
       accessor: (p: ProductTypes) => `₹${p.price.toFixed(2)}`,
-      className: "text-white font-medium"
+      className: 'text-white font-medium',
     },
   ];
 
@@ -141,7 +139,10 @@ const ProductsPage = () => {
             <p className="text-gray-400 text-sm">Manage your inventory items and stock levels.</p>
           </div>
           <button
-            onClick={() => { setEditingProduct(null); setIsModalOpen(true); }}
+            onClick={() => {
+              setEditingProduct(null);
+              setIsModalOpen(true);
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-[#05070d] font-bold rounded-lg transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
           >
             <Plus className="w-4 h-4" />
@@ -152,22 +153,28 @@ const ProductsPage = () => {
         {/* Toolbar & Data Table */}
         <div className="flex flex-col gap-4">
           <div className="flex justify-between items-center bg-[#0d1117] p-4 rounded-xl border border-[#1a1f2a]">
-            <SearchBar value={searchQuery} onChange={(v) => { setSearchQuery(v); setCurrentPage(1); }} placeholder="Search products..." />
+            <SearchBar
+              value={searchQuery}
+              onChange={(v) => {
+                setSearchQuery(v);
+                setCurrentPage(1);
+              }}
+              placeholder="Search products..."
+            />
           </div>
 
           <DataTable
             data={products}
             columns={columns}
-            onEdit={(p) => { setEditingProduct(p); setIsModalOpen(true); }}
+            onEdit={(p) => {
+              setEditingProduct(p);
+              setIsModalOpen(true);
+            }}
             onDelete={handleDelete}
             emptyMessage="No products found in your inventory."
           />
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       </div>
 
@@ -175,12 +182,12 @@ const ProductsPage = () => {
       <AddEditModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingProduct ? "Edit Product" : "Add New Product"}
+        title={editingProduct ? 'Edit Product' : 'Add New Product'}
       >
         <Formik
           initialValues={{
-            name: editingProduct?.name || "",
-            description: editingProduct?.description || "",
+            name: editingProduct?.name || '',
+            description: editingProduct?.description || '',
             quantity: editingProduct?.quantity || 0,
             price: editingProduct?.price || 0,
           }}
@@ -193,7 +200,7 @@ const ProductsPage = () => {
                 <label className="block text-sm font-medium text-gray-400 mb-1">Product Name</label>
                 <Field
                   name="name"
-                  className={`w-full bg-[#151b23] border ${errors.name && touched.name ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                  className={`w-full bg-[#151b23] border ${errors.name && touched.name ? 'border-red-500' : 'border-[#1a1f2a]'} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
                 />
                 <ErrorMessage name="name" component="div" className="text-xs text-red-500 mt-1" />
               </div>
@@ -204,7 +211,7 @@ const ProductsPage = () => {
                   name="description"
                   as="textarea"
                   rows={3}
-                  className={`w-full bg-[#151b23] border ${errors.description && touched.description ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                  className={`w-full bg-[#151b23] border ${errors.description && touched.description ? 'border-red-500' : 'border-[#1a1f2a]'} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
                 />
                 <ErrorMessage name="description" component="div" className="text-xs text-red-500 mt-1" />
               </div>
@@ -215,7 +222,7 @@ const ProductsPage = () => {
                   <Field
                     name="quantity"
                     type="number"
-                    className={`w-full bg-[#151b23] border ${errors.quantity && touched.quantity ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                    className={`w-full bg-[#151b23] border ${errors.quantity && touched.quantity ? 'border-red-500' : 'border-[#1a1f2a]'} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
                   />
                   <ErrorMessage name="quantity" component="div" className="text-xs text-red-500 mt-1" />
                 </div>
@@ -225,7 +232,7 @@ const ProductsPage = () => {
                     name="price"
                     type="number"
                     step="0.01"
-                    className={`w-full bg-[#151b23] border ${errors.price && touched.price ? "border-red-500" : "border-[#1a1f2a]"} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
+                    className={`w-full bg-[#151b23] border ${errors.price && touched.price ? 'border-red-500' : 'border-[#1a1f2a]'} p-2.5 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-all`}
                   />
                   <ErrorMessage name="price" component="div" className="text-xs text-red-500 mt-1" />
                 </div>
@@ -244,7 +251,7 @@ const ProductsPage = () => {
                   disabled={isSubmitting}
                   className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-[#05070d] font-bold rounded-lg transition-all disabled:opacity-50 active:scale-95"
                 >
-                  {editingProduct ? "Update Product" : "Save Product"}
+                  {editingProduct ? 'Update Product' : 'Save Product'}
                 </button>
               </div>
             </Form>

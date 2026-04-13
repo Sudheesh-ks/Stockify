@@ -1,4 +1,4 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle } from 'lucide-react';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -8,7 +8,7 @@ interface ConfirmationModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  type?: "danger" | "warning" | "success";
+  type?: 'danger' | 'warning' | 'success';
 }
 
 const ConfirmationModal = ({
@@ -17,16 +17,16 @@ const ConfirmationModal = ({
   onConfirm,
   title,
   message,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
-  type = "warning",
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
+  type = 'warning',
 }: ConfirmationModalProps) => {
   if (!isOpen) return null;
 
   const typeConfig = {
-    danger: "bg-red-500 hover:bg-red-600 text-white",
-    warning: "bg-emerald-500 hover:bg-emerald-600 text-[#05070d]",
-    success: "bg-emerald-500 hover:bg-emerald-600 text-[#05070d]",
+    danger: 'bg-red-500 hover:bg-red-600 text-white',
+    warning: 'bg-emerald-500 hover:bg-emerald-600 text-[#05070d]',
+    success: 'bg-emerald-500 hover:bg-emerald-600 text-[#05070d]',
   };
 
   return (
@@ -34,14 +34,14 @@ const ConfirmationModal = ({
       <div className="bg-[#0d1117] border border-[#1a1f2a] rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6">
           <div className="flex items-center gap-4 mb-4">
-            <div className={`p-3 rounded-full ${type === 'danger' ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}>
+            <div
+              className={`p-3 rounded-full ${type === 'danger' ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}`}
+            >
               <AlertTriangle className="h-6 w-6" />
             </div>
             <h2 className="text-xl font-bold text-white tracking-tight">{title}</h2>
           </div>
-          <p className="text-gray-400 text-sm leading-relaxed mb-8">
-            {message}
-          </p>
+          <p className="text-gray-400 text-sm leading-relaxed mb-8">{message}</p>
           <div className="flex gap-3">
             <button
               onClick={onClose}

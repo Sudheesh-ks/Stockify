@@ -1,9 +1,9 @@
-import { ICustomerService } from "../../services/interface/ICustomerService";
-import { sendResponse } from "../../utils/apiResponse.util";
-import { HttpStatus } from "../../constants/status.constants";
-import { HttpResponse } from "../../constants/responseMessage.constants";
-import { Request, Response } from "express";
-import { ICustomerController } from "../interface/ICustomerController";
+import { ICustomerService } from '../../services/interface/ICustomerService';
+import { sendResponse } from '../../utils/apiResponse.util';
+import { HttpStatus } from '../../constants/status.constants';
+import { HttpResponse } from '../../constants/responseMessage.constants';
+import { Request, Response } from 'express';
+import { ICustomerController } from '../interface/ICustomerController';
 
 export class CustomerController implements ICustomerController {
   constructor(private readonly _customerService: ICustomerService) {}
@@ -17,22 +17,9 @@ export class CustomerController implements ICustomerController {
         address,
         mobile,
       });
-      sendResponse(
-        res,
-        HttpStatus.CREATED,
-        true,
-        HttpResponse.CUSTOMER_CREATED,
-        customer,
-      );
+      sendResponse(res, HttpStatus.CREATED, true, HttpResponse.CUSTOMER_CREATED, customer);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 
@@ -46,22 +33,9 @@ export class CustomerController implements ICustomerController {
         address,
         mobile,
       });
-      sendResponse(
-        res,
-        HttpStatus.OK,
-        true,
-        HttpResponse.CUSTOMER_UPDATED,
-        customer,
-      );
+      sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_UPDATED, customer);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 
@@ -70,22 +44,9 @@ export class CustomerController implements ICustomerController {
       const id = req.params.id as string;
       const userId = (req as any).userId;
       const customer = await this._customerService.deleteCustomer(id, userId);
-      sendResponse(
-        res,
-        HttpStatus.OK,
-        true,
-        HttpResponse.CUSTOMER_DELETED,
-        customer,
-      );
+      sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_DELETED, customer);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 
@@ -94,22 +55,9 @@ export class CustomerController implements ICustomerController {
       const id = req.params.id as string;
       const userId = (req as any).userId;
       const customer = await this._customerService.getCustomer(id, userId);
-      sendResponse(
-        res,
-        HttpStatus.OK,
-        true,
-        HttpResponse.CUSTOMER_FOUND,
-        customer,
-      );
+      sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMER_FOUND, customer);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 
@@ -119,28 +67,10 @@ export class CustomerController implements ICustomerController {
       const userId = (req as any).userId;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 5;
-      const result = await this._customerService.getAllCustomers(
-        userId,
-        search,
-        page,
-        limit,
-      );
-      sendResponse(
-        res,
-        HttpStatus.OK,
-        true,
-        HttpResponse.CUSTOMERS_FOUND,
-        result,
-      );
+      const result = await this._customerService.getAllCustomers(userId, search, page, limit);
+      sendResponse(res, HttpStatus.OK, true, HttpResponse.CUSTOMERS_FOUND, result);
     } catch (error) {
-      sendResponse(
-        res,
-        HttpStatus.BAD_REQUEST,
-        false,
-        (error as Error).message,
-        null,
-        error,
-      );
+      sendResponse(res, HttpStatus.BAD_REQUEST, false, (error as Error).message, null, error);
     }
   }
 }

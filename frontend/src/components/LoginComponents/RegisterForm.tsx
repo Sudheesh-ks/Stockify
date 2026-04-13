@@ -1,5 +1,5 @@
-import { Lock, Mail, Store, User } from "lucide-react";
-import InputField from "./InputField";
+import { Lock, Mail, Store, User } from 'lucide-react';
+import InputField from './InputField';
 
 type RegisterFormProps = {
   onSwitch: (mode?: string) => void;
@@ -13,12 +13,8 @@ type RegisterFormProps = {
 
 const RegisterForm = ({ onSwitch, formData, errors, touched, onChange, onBlur, loading }: RegisterFormProps) => (
   <div>
-    <h2 className="text-2xl font-bold text-white tracking-tight">
-      Create account
-    </h2>
-    <p className="text-sm text-gray-500 mt-1 mb-6">
-      Set up your store in seconds
-    </p>
+    <h2 className="text-2xl font-bold text-white tracking-tight">Create account</h2>
+    <p className="text-sm text-gray-500 mt-1 mb-6">Set up your store in seconds</p>
 
     <InputField
       label="Email"
@@ -69,14 +65,18 @@ const RegisterForm = ({ onSwitch, formData, errors, touched, onChange, onBlur, l
       onBlur={onBlur}
     />
 
-    <button type="submit" disabled={loading} className="w-full h-11 mt-2 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 active:scale-[0.98] transition-all duration-150 shadow-lg shadow-emerald-900/50">
-      {loading ? "Creating account..." : "Create Account"}
+    <button
+      type="submit"
+      disabled={loading}
+      className="w-full h-11 mt-2 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 active:scale-[0.98] transition-all duration-150 shadow-lg shadow-emerald-900/50"
+    >
+      {loading ? 'Creating account...' : 'Create Account'}
     </button>
 
     <p className="text-center text-xs text-gray-600 mt-5">
-      Already have an account?{" "}
+      Already have an account?{' '}
       <button
-        onClick={() => onSwitch("login")}
+        onClick={() => onSwitch('login')}
         className="text-emerald-500 font-semibold hover:text-emerald-400 transition-colors"
       >
         Sign in

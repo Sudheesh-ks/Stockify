@@ -1,4 +1,4 @@
-import { ProductDTO } from "../../dtos/product.dto";
+import { ProductDTO } from '../../dtos/product.dto';
 
 export interface IProductService {
   createProduct(

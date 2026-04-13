@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -11,11 +11,11 @@ interface JwtPayload {
 }
 
 export const generateAccessToken = (id: string, email: string) => {
-  return jwt.sign({ id, email }, JWT_SECRET, { expiresIn: "15m" });
+  return jwt.sign({ id, email }, JWT_SECRET, { expiresIn: '15m' });
 };
 
 export const generateRefreshToken = (id: string, email: string) => {
-  return jwt.sign({ id, email }, JWT_REFRESH_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ id, email }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 };
 
 export const verifyAccessToken = (token: string): JwtPayload => {

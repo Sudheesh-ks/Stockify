@@ -3,4 +3,4 @@ export type UserTypes = {
   username: string;
   shopname: string;
   password: string;
-}
+};

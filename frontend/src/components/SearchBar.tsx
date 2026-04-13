@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search } from 'lucide-react';
 
 interface SearchBarProps {
   value: string;
@@ -6,7 +6,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-const SearchBar = ({ value, onChange, placeholder = "Search..." }: SearchBarProps) => {
+const SearchBar = ({ value, onChange, placeholder = 'Search...' }: SearchBarProps) => {
   return (
     <div className="relative w-full max-w-md group">
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

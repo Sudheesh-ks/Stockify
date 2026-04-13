@@ -1,15 +1,15 @@
-import { Routes, Route } from "react-router-dom";
-import Loginpage from "../pages/LoginPage";
-import ForgotPassword from "../pages/EmailVerification";
-import OTPVerification from "../pages/OtpVerification";
-import ResetPassword from "../pages/ResetPassword";
-import Dashboard from "../pages/Dashboard";
-import ProtectedRoute from "./ProtectedRoutes";
-import PublicRoute from "./PublicRoute";
-import ProductsPage from "../pages/ProductsPage";
-import CustomersPage from "../pages/CustomersPage";
-import SalesPage from "../pages/SalesPage";
-import ReportsPage from "../pages/ReportsPage";
+import { Routes, Route } from 'react-router-dom';
+import Loginpage from '../pages/LoginPage';
+import ForgotPassword from '../pages/EmailVerification';
+import OTPVerification from '../pages/OtpVerification';
+import ResetPassword from '../pages/ResetPassword';
+import Dashboard from '../pages/Dashboard';
+import ProtectedRoute from './ProtectedRoutes';
+import PublicRoute from './PublicRoute';
+import ProductsPage from '../pages/ProductsPage';
+import CustomersPage from '../pages/CustomersPage';
+import SalesPage from '../pages/SalesPage';
+import ReportsPage from '../pages/ReportsPage';
 
 const UserRoutes = () => {
   return (

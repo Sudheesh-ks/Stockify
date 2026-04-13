@@ -1,5 +1,5 @@
-import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const StatCard = ({ title, value, Icon, link }: any) => (
   <div className="group flex flex-col p-6 rounded-2xl bg-[#0d1117]/80 border border-[#1a1f2a] hover:border-emerald-500/50 shadow-xl transition-all duration-300">

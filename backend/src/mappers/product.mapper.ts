@@ -1,5 +1,5 @@
-import { ProductDTO } from "../dtos/product.dto";
-import { ProductsDocument } from "../models/productsModel";
+import { ProductDTO } from '../dtos/product.dto';
+import { ProductsDocument } from '../models/productsModel';
 
 export const toProductDTO = (product: ProductsDocument): ProductDTO => {
   return {

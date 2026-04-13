@@ -1,8 +1,7 @@
-import mongoose, { Schema, Document, Model, Types } from "mongoose";
-import { ProductsTypes } from "../types/product";
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
+import { ProductsTypes } from '../types/product';
 
-export interface ProductsDocument
-  extends Omit<ProductsTypes, "_id" | "userId">, Document {
+export interface ProductsDocument extends Omit<ProductsTypes, '_id' | 'userId'>, Document {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
 }
@@ -11,7 +10,7 @@ const productsSchema: Schema<ProductsDocument> = new Schema<ProductsDocument>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "users",
+      ref: 'users',
       required: true,
     },
     name: {
@@ -38,9 +37,6 @@ const productsSchema: Schema<ProductsDocument> = new Schema<ProductsDocument>(
   },
 );
 
-const productsModel: Model<ProductsDocument> = mongoose.model<ProductsDocument>(
-  "products",
-  productsSchema,
-);
+const productsModel: Model<ProductsDocument> = mongoose.model<ProductsDocument>('products', productsSchema);
 
 export default productsModel;

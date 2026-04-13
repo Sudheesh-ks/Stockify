@@ -1,7 +1,7 @@
-import mongoose, { Schema, Document, Model, Types } from "mongoose";
-import { OtpTypes } from "../types/otp";
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
+import { OtpTypes } from '../types/otp';
 
-export interface OtpDocument extends Omit<OtpTypes, "_id">, Document {
+export interface OtpDocument extends Omit<OtpTypes, '_id'>, Document {
   _id: Types.ObjectId;
 }
 
@@ -18,7 +18,7 @@ const otpSchema: Schema<OtpDocument> = new Schema<OtpDocument>(
     },
     purpose: {
       type: String,
-      enum: ["register", "reset-password"],
+      enum: ['register', 'reset-password'],
       required: true,
     },
     userData: {
@@ -38,9 +38,6 @@ const otpSchema: Schema<OtpDocument> = new Schema<OtpDocument>(
   },
 );
 
-const otpModel: Model<OtpDocument> = mongoose.model<OtpDocument>(
-  "otp",
-  otpSchema,
-);
+const otpModel: Model<OtpDocument> = mongoose.model<OtpDocument>('otp', otpSchema);
 
 export default otpModel;

@@ -1,8 +1,8 @@
-import { SaleDTO } from "../../dtos/sale.dto";
-import { toSaleDTO } from "../../mappers/sale.mapper";
-import { ProductRepository } from "../../repositories/implementation/productRepository";
-import { SaleRepository } from "../../repositories/implementation/saleRepository";
-import { ISaleService } from "../interface/ISaleService";
+import { SaleDTO } from '../../dtos/sale.dto';
+import { toSaleDTO } from '../../mappers/sale.mapper';
+import { ProductRepository } from '../../repositories/implementation/productRepository';
+import { SaleRepository } from '../../repositories/implementation/saleRepository';
+import { ISaleService } from '../interface/ISaleService';
 
 export class SaleService implements ISaleService {
   constructor(
@@ -13,17 +13,14 @@ export class SaleService implements ISaleService {
   async recordSale(
     userId: string,
     items: { productId: string; quantity: number }[],
-    customerName: string = "Cash",
+    customerName: string = 'Cash',
     date: Date = new Date(),
   ): Promise<SaleDTO> {
     let totalAmount = 0;
     const saleItems = [];
 
     for (const item of items) {
-      const product = await this._productRepository.getProduct(
-        item.productId,
-        userId,
-      );
+      const product = await this._productRepository.getProduct(item.productId, userId);
       if (product.quantity < item.quantity) {
         throw new Error(`Insufficient stock for ${product.name}`);
       }
@@ -46,17 +43,10 @@ export class SaleService implements ISaleService {
     });
 
     for (const item of saleItems) {
-      const product = await this._productRepository.getProduct(
-        item.productId.toString(),
-        userId,
-      );
-      await this._productRepository.updateProduct(
-        item.productId.toString(),
-        userId,
-        {
-          quantity: product.quantity - item.quantity,
-        } as any,
-      );
+      const product = await this._productRepository.getProduct(item.productId.toString(), userId);
+      await this._productRepository.updateProduct(item.productId.toString(), userId, {
+        quantity: product.quantity - item.quantity,
+      } as any);
     }
 
     const populatedSale = await this._saleRepository.findOne({
@@ -89,7 +79,7 @@ export class SaleService implements ISaleService {
     }
 
     if (filters.customerName) {
-      query.customerName = { $regex: filters.customerName, $options: "i" };
+      query.customerName = { $regex: filters.customerName, $options: 'i' };
     }
 
     if (filters.startDate || filters.endDate) {
@@ -98,12 +88,7 @@ export class SaleService implements ISaleService {
       if (filters.endDate) query.date.$lte = new Date(filters.endDate);
     }
 
-    const { sales, totalCount } = await this._saleRepository.getAllSales(
-      userId,
-      query,
-      page,
-      limit,
-    );
+    const { sales, totalCount } = await this._saleRepository.getAllSales(userId, query, page, limit);
     const effectiveLimit = limit && limit > 0 ? limit : 5;
     const totalPages = Math.max(1, Math.ceil(totalCount / effectiveLimit));
 
@@ -115,14 +100,8 @@ export class SaleService implements ISaleService {
     };
   }
 
-  async getSalesByCustomer(
-    userId: string,
-    customerName: string,
-  ): Promise<SaleDTO[]> {
-    const sales = await this._saleRepository.getSalesByCustomer(
-      userId,
-      customerName,
-    );
+  async getSalesByCustomer(userId: string, customerName: string): Promise<SaleDTO[]> {
+    const sales = await this._saleRepository.getSalesByCustomer(userId, customerName);
     return sales.map(toSaleDTO);
   }
 
@@ -136,11 +115,7 @@ export class SaleService implements ISaleService {
     totalPages: number;
     currentPage: number;
   }> {
-    const { data, totalCount } = await this._saleRepository.getItemsReport(
-      userId,
-      page,
-      limit,
-    );
+    const { data, totalCount } = await this._saleRepository.getItemsReport(userId, page, limit);
     const totalPages = Math.ceil(totalCount / limit);
     return { data, totalCount, totalPages, currentPage: page };
   }
@@ -155,11 +130,7 @@ export class SaleService implements ISaleService {
     totalPages: number;
     currentPage: number;
   }> {
-    const { data, totalCount } = await this._saleRepository.getCustomerLedger(
-      userId,
-      page,
-      limit,
-    );
+    const { data, totalCount } = await this._saleRepository.getCustomerLedger(userId, page, limit);
     const totalPages = Math.ceil(totalCount / limit);
     return { data, totalCount, totalPages, currentPage: page };
   }
@@ -173,24 +144,15 @@ export class SaleService implements ISaleService {
     });
 
     if (!sale) {
-      console.error(
-        `Sale deletion failed: Sale not found or unauthorized. ID: ${id}, userId: ${currentUserId}`,
-      );
-      throw new Error("Sale not found or unauthorized");
+      console.error(`Sale deletion failed: Sale not found or unauthorized. ID: ${id}, userId: ${currentUserId}`);
+      throw new Error('Sale not found or unauthorized');
     }
 
     for (const item of sale.items) {
-      const product = await this._productRepository.getProduct(
-        item.productId.toString(),
-        currentUserId,
-      );
-      await this._productRepository.updateProduct(
-        item.productId.toString(),
-        currentUserId,
-        {
-          quantity: (product.quantity || 0) + (item.quantity || 0),
-        } as any,
-      );
+      const product = await this._productRepository.getProduct(item.productId.toString(), currentUserId);
+      await this._productRepository.updateProduct(item.productId.toString(), currentUserId, {
+        quantity: (product.quantity || 0) + (item.quantity || 0),
+      } as any);
     }
 
     await this._saleRepository.deleteSale(id);

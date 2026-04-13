@@ -1,7 +1,7 @@
-import { ProductDTO } from "../../dtos/product.dto";
-import { toProductDTO } from "../../mappers/product.mapper";
-import { ProductRepository } from "../../repositories/implementation/productRepository";
-import { IProductService } from "../interface/IProductService";
+import { ProductDTO } from '../../dtos/product.dto';
+import { toProductDTO } from '../../mappers/product.mapper';
+import { ProductRepository } from '../../repositories/implementation/productRepository';
+import { IProductService } from '../interface/IProductService';
 
 export class ProductService implements IProductService {
   constructor(private readonly _productRepository: ProductRepository) {}
@@ -32,19 +32,12 @@ export class ProductService implements IProductService {
       price?: number;
     },
   ): Promise<ProductDTO> {
-    const updatedProduct = await this._productRepository.updateProduct(
-      id,
-      userId,
-      product,
-    );
+    const updatedProduct = await this._productRepository.updateProduct(id, userId, product);
     return toProductDTO(updatedProduct);
   }
 
   async deleteProduct(id: string, userId: string): Promise<ProductDTO> {
-    const deletedProduct = await this._productRepository.deleteProduct(
-      id,
-      userId,
-    );
+    const deletedProduct = await this._productRepository.deleteProduct(id, userId);
     return toProductDTO(deletedProduct);
   }
 
@@ -64,8 +57,7 @@ export class ProductService implements IProductService {
     totalPages: number;
     currentPage: number;
   }> {
-    const { products, totalCount } =
-      await this._productRepository.getAllProducts(userId, search, page, limit);
+    const { products, totalCount } = await this._productRepository.getAllProducts(userId, search, page, limit);
 
     const effectiveLimit = limit && limit > 0 ? limit : 10;
     const totalPages = Math.max(1, Math.ceil(totalCount / effectiveLimit));

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document } from 'mongoose';
 
 export interface CustomerDocument extends Document {
   userId: mongoose.Types.ObjectId;
@@ -11,7 +11,7 @@ export interface CustomerDocument extends Document {
 
 const customerSchema = new Schema<CustomerDocument>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
     name: { type: String, required: true },
     address: { type: String, required: true },
     mobile: { type: String, required: true },
@@ -19,4 +19,4 @@ const customerSchema = new Schema<CustomerDocument>(
   { timestamps: true },
 );
 
-export default mongoose.model<CustomerDocument>("customers", customerSchema);
+export default mongoose.model<CustomerDocument>('customers', customerSchema);

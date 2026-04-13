@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Mail, LayoutGrid } from "lucide-react";
-import toast from "react-hot-toast";
-import { showErrorToast } from "../utils/errorHandler";
-import { forgotPasswordAPI } from "../services/authServices";
-import InputField from "../components/LoginComponents/InputField";
-import { validateEmail } from "../utils/validationSchema";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Mail, LayoutGrid } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { showErrorToast } from '../utils/errorHandler';
+import { forgotPasswordAPI } from '../services/authServices';
+import InputField from '../components/LoginComponents/InputField';
+import { validateEmail } from '../utils/validationSchema';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
   const [touched, setTouched] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -42,12 +42,12 @@ const ForgotPassword = () => {
       console.log('API Response:', response);
 
       if (response && response.success) {
-        toast.success("OTP sent to your email");
-        localStorage.setItem("tempUserData", JSON.stringify({ email, purpose: "reset-password" }));
-        navigate("/otp-verification", { state: { email, purpose: "reset-password" } });
+        toast.success('OTP sent to your email');
+        localStorage.setItem('tempUserData', JSON.stringify({ email, purpose: 'reset-password' }));
+        navigate('/otp-verification', { state: { email, purpose: 'reset-password' } });
       } else {
         console.error('Response or success property missing:', response);
-        toast.error(response?.message || "Failed to send OTP");
+        toast.error(response?.message || 'Failed to send OTP');
       }
     } catch (error) {
       console.error('API call failed:', error);
@@ -59,14 +59,13 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen bg-[#080b12] flex items-center justify-center p-4 relative overflow-hidden">
-
       {/* Grid background */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+            'linear-gradient(rgba(16,185,129,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(16,185,129,0.04) 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
         }}
       />
 
@@ -75,7 +74,6 @@ const ForgotPassword = () => {
       <div className="absolute bottom-[-8rem] right-[-6rem] w-[24rem] h-[24rem] rounded-full bg-green-700 opacity-[0.08] blur-[120px] pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-sm">
-
         {/* Brand */}
         <div className="flex items-center justify-center gap-2.5 mb-8">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-900/60">
@@ -88,14 +86,9 @@ const ForgotPassword = () => {
 
         {/* Card */}
         <div className="rounded-2xl border border-[#1a1f2a] bg-[#0d1117] p-7 shadow-2xl shadow-black/60">
+          <h2 className="text-2xl font-bold text-white tracking-tight">Forgot Password</h2>
 
-          <h2 className="text-2xl font-bold text-white tracking-tight">
-            Forgot Password
-          </h2>
-
-          <p className="text-sm text-gray-400 mt-1 mb-6">
-            Enter your email to receive a verification code
-          </p>
+          <p className="text-sm text-gray-400 mt-1 mb-6">Enter your email to receive a verification code</p>
 
           <InputField
             label="Email"
@@ -115,13 +108,11 @@ const ForgotPassword = () => {
             disabled={loading}
             className="w-full h-11 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 transition-all shadow-lg shadow-emerald-900/50 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Sending..." : "Send OTP"}
+            {loading ? 'Sending...' : 'Send OTP'}
           </button>
         </div>
 
-        <p className="text-center text-[11px] text-gray-700 mt-5">
-          Protected by Stockify Security · v2.0
-        </p>
+        <p className="text-center text-[11px] text-gray-700 mt-5">Protected by Stockify Security · v2.0</p>
       </div>
     </div>
   );

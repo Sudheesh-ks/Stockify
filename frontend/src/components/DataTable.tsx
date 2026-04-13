@@ -1,5 +1,5 @@
-import { Edit, Trash2 } from "lucide-react";
-import Loading from "./Loading";
+import { Edit, Trash2 } from 'lucide-react';
+import Loading from './Loading';
 
 export interface Column<T> {
   header: string;
@@ -22,9 +22,9 @@ const DataTable = <T extends Record<string, any>>({
   columns,
   onEdit,
   onDelete,
-  idField = "_id",
+  idField = '_id',
   isLoading,
-  emptyMessage = "No records found.",
+  emptyMessage = 'No records found.',
 }: DataTableProps<T>) => {
   if (isLoading) {
     return <Loading />;
@@ -48,13 +48,16 @@ const DataTable = <T extends Record<string, any>>({
                 <th
                   key={idx}
                   scope="col"
-                  className={`px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider ${col.className || ""}`}
+                  className={`px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider ${col.className || ''}`}
                 >
                   {col.header}
                 </th>
               ))}
               {(onEdit || onDelete) && (
-                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <th
+                  scope="col"
+                  className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider"
+                >
                   Actions
                 </th>
               )}
@@ -64,8 +67,11 @@ const DataTable = <T extends Record<string, any>>({
             {data.map((item, idx) => (
               <tr key={item[idField] || idx} className="hover:bg-[#11161f] transition-colors duration-150 group">
                 {columns.map((col, colIdx) => (
-                  <td key={colIdx} className={`px-6 py-4 whitespace-nowrap text-sm text-gray-300 ${col.className || ""}`}>
-                    {typeof col.accessor === "function" ? col.accessor(item) : item[col.accessor as keyof T]}
+                  <td
+                    key={colIdx}
+                    className={`px-6 py-4 whitespace-nowrap text-sm text-gray-300 ${col.className || ''}`}
+                  >
+                    {typeof col.accessor === 'function' ? col.accessor(item) : item[col.accessor as keyof T]}
                   </td>
                 ))}
                 {(onEdit || onDelete) && (

@@ -1,20 +1,15 @@
-import { AuthPurpose } from "../../constants/authPurpose.constants";
-import { HttpResponse } from "../../constants/responseMessage.constants";
-import { UserDTO } from "../../dtos/user.dto";
-import { toUserDTO } from "../../mappers/user.mapper";
-import { userDocument } from "../../models/userModel";
-import { IAuthRepository } from "../../repositories/interface/IAuthRepository";
-import { IOtpRepository } from "../../repositories/interface/IOtpRepository";
-import { sendOTP } from "../../utils/mail.util";
-import { generateOTP } from "../../utils/otp.util";
-import {
-  isValidEmail,
-  isValidPassword,
-  isValidShopname,
-  isValidUsername,
-} from "../../utils/validation.util";
-import bcrypt from "bcrypt";
-import { IAuthService } from "../interface/IAuthService";
+import { AuthPurpose } from '../../constants/authPurpose.constants';
+import { HttpResponse } from '../../constants/responseMessage.constants';
+import { UserDTO } from '../../dtos/user.dto';
+import { toUserDTO } from '../../mappers/user.mapper';
+import { userDocument } from '../../models/userModel';
+import { IAuthRepository } from '../../repositories/interface/IAuthRepository';
+import { IOtpRepository } from '../../repositories/interface/IOtpRepository';
+import { sendOTP } from '../../utils/mail.util';
+import { generateOTP } from '../../utils/otp.util';
+import { isValidEmail, isValidPassword, isValidShopname, isValidUsername } from '../../utils/validation.util';
+import bcrypt from 'bcrypt';
+import { IAuthService } from '../interface/IAuthService';
 
 export class AuthService implements IAuthService {
   constructor(
@@ -22,12 +17,7 @@ export class AuthService implements IAuthService {
     private readonly _otpRepository: IOtpRepository,
   ) {}
 
-  async registerUser(data: {
-    email: string;
-    username: string;
-    shopname: string;
-    password: string;
-  }): Promise<void> {
+  async registerUser(data: { email: string; username: string; shopname: string; password: string }): Promise<void> {
     const { email, username, shopname, password } = data;
     if (!email || !username || !shopname || !password) {
       throw new Error(HttpResponse.FIELDS_REQUIRED);
@@ -50,20 +40,16 @@ export class AuthService implements IAuthService {
 
     const hashed = await bcrypt.hash(password, 10);
     const otp = generateOTP();
-    console.log("Generated OTP:", otp);
+    console.log('Generated OTP:', otp);
     await this._otpRepository.storeOtp(email, {
       otp,
       purpose: AuthPurpose.REGISTER,
       userData: { email, username, shopname, password: hashed },
     });
-    sendOTP(email, otp).catch((err) => console.error("OTP send failed:", err));
+    sendOTP(email, otp).catch((err) => console.error('OTP send failed:', err));
   }
 
-  async verifyOtp(
-    email: string,
-    otp: string,
-    purpose: AuthPurpose,
-  ): Promise<{ purpose: string; user?: UserDTO }> {
+  async verifyOtp(email: string, otp: string, purpose: AuthPurpose): Promise<{ purpose: string; user?: UserDTO }> {
     const record = await this._otpRepository.getOtp(email, otp, purpose);
     if (!record) throw new Error(HttpResponse.OTP_INVALID);
 
@@ -86,7 +72,7 @@ export class AuthService implements IAuthService {
     }
 
     if (purpose === AuthPurpose.RESET_PASSWORD) {
-      await this._otpRepository.storeOtp(email, { otp: "VERIFIED", purpose });
+      await this._otpRepository.storeOtp(email, { otp: 'VERIFIED', purpose });
       return { purpose };
     }
 
@@ -99,9 +85,7 @@ export class AuthService implements IAuthService {
     shopname: string;
     password: string;
   }): Promise<UserDTO> {
-    const newUser = (await this._authRepository.createUser(
-      userData,
-    )) as userDocument;
+    const newUser = (await this._authRepository.createUser(userData)) as userDocument;
     return toUserDTO(newUser);
   }
 
@@ -113,7 +97,7 @@ export class AuthService implements IAuthService {
     }
 
     const newOtp = generateOTP();
-    console.log("Generated new OTP:", newOtp);
+    console.log('Generated new OTP:', newOtp);
 
     const updatedRecord = {
       otp: newOtp,
@@ -122,9 +106,7 @@ export class AuthService implements IAuthService {
     };
 
     await this._otpRepository.storeOtp(email, updatedRecord);
-    sendOTP(email, newOtp).catch((err) =>
-      console.error("OTP resend failed:", err),
-    );
+    sendOTP(email, newOtp).catch((err) => console.error('OTP resend failed:', err));
   }
 
   async forgotPasswordRequest(email: string): Promise<void> {
@@ -141,12 +123,12 @@ export class AuthService implements IAuthService {
     }
 
     const otp = generateOTP();
-    console.log("Generated OTP for password reset:", otp);
+    console.log('Generated OTP for password reset:', otp);
     await this._otpRepository.storeOtp(email, {
       otp,
       purpose: AuthPurpose.RESET_PASSWORD,
     });
-    sendOTP(email, otp).catch((err) => console.error("OTP send failed:", err));
+    sendOTP(email, otp).catch((err) => console.error('OTP send failed:', err));
   }
 
   async resetPassword(email: string, newPassword: string): Promise<void> {
@@ -161,19 +143,12 @@ export class AuthService implements IAuthService {
     }
 
     const record = await this._otpRepository.findOtpByEmail(email);
-    if (
-      !record ||
-      record.purpose !== AuthPurpose.RESET_PASSWORD ||
-      record.otp !== "VERIFIED"
-    ) {
+    if (!record || record.purpose !== AuthPurpose.RESET_PASSWORD || record.otp !== 'VERIFIED') {
       throw new Error(HttpResponse.OTP_EXPIRED_OR_INVALID);
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    const updated = await this._authRepository.updatePasswordByEmail(
-      email,
-      hashedPassword,
-    );
+    const updated = await this._authRepository.updatePasswordByEmail(email, hashedPassword);
 
     if (!updated) {
       throw new Error(HttpResponse.USER_NOT_FOUND);
