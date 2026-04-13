@@ -11,6 +11,8 @@ import {
 import { IAuthController } from "../interface/IAuthController";
 import { IAuthService } from "../../services/interface/IAuthService";
 
+const refreshTokenMaxAge = Number(process.env.REFRESH_TOKEN_MAX_AGE);
+
 export class AuthController implements IAuthController {
   constructor(private readonly _authService: IAuthService) {}
 
@@ -56,7 +58,7 @@ export class AuthController implements IAuthController {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          maxAge: refreshTokenMaxAge, // 7 days
         });
 
         sendResponse(res, HttpStatus.OK, true, HttpResponse.REGISTER_SUCCESS, {
@@ -121,7 +123,7 @@ export class AuthController implements IAuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: refreshTokenMaxAge, // 7 days
       });
 
       sendResponse(res, HttpStatus.OK, true, HttpResponse.LOGIN_SUCCESS, {
