@@ -6,7 +6,7 @@ import { Request, Response } from 'express';
 import { ICustomerController } from '../interface/ICustomerController';
 
 export class CustomerController implements ICustomerController {
-  constructor(private readonly _customerService: ICustomerService) {}
+  constructor(private readonly _customerService: ICustomerService) { }
 
   async createCustomer(req: Request, res: Response): Promise<void> {
     try {

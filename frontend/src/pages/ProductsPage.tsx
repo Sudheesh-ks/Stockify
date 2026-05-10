@@ -27,6 +27,7 @@ const ProductsPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductTypes | null>(null);
+  const [loading,setLoading] = useState(true);
 
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -44,12 +45,15 @@ const ProductsPage = () => {
 
   const fetchProducts = async () => {
     try {
+      setLoading(true);
       const data = await getAllProductsAPI(searchQuery, currentPage, ITEMS_PER_PAGE);
       console.log('Fetch Products Result:', data);
       setProducts(data.products || []);
       setTotalPages(data.totalPages || 1);
     } catch (error) {
       showErrorToast(error);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -171,7 +175,7 @@ const ProductsPage = () => {
               setIsModalOpen(true);
             }}
             onDelete={handleDelete}
-            emptyMessage="No products found in your inventory."
+            isLoading={loading}
           />
 
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

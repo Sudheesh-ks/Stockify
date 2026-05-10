@@ -6,7 +6,7 @@ import { HttpStatus } from '../../constants/status.constants';
 import { HttpResponse } from '../../constants/responseMessage.constants';
 
 export class DashboardController implements IDashboardController {
-  constructor(private readonly _dashboardService: IDashboardService) {}
+  constructor(private readonly _dashboardService: IDashboardService) { }
 
   async getDashboardStats(req: Request, res: Response): Promise<void> {
     try {

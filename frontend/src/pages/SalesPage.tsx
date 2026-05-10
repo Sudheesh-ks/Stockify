@@ -31,6 +31,7 @@ const SalesPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<SaleTypes | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -78,6 +79,7 @@ const SalesPage = () => {
 
   const fetchSales = async () => {
     try {
+      setLoading(true);
       const data = await getAllSalesAPI({
         customerName: searchQuery,
         page: currentPage,
@@ -87,6 +89,8 @@ const SalesPage = () => {
       setTotalPages(data.totalPages || 1);
     } catch (error) {
       showErrorToast(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -220,7 +224,7 @@ const SalesPage = () => {
             />
           </div>
 
-          <DataTable data={sales} columns={columns} emptyMessage="No sales recorded yet." />
+          <DataTable data={sales} columns={columns} isLoading={loading} emptyMessage="No sales recorded yet." />
 
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>

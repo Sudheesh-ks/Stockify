@@ -36,7 +36,7 @@ export class SaleService implements ISaleService {
     }
 
     const sale = await this._saleRepository.createSale(userId, {
-      items: saleItems as any,
+      items: saleItems,
       totalAmount,
       customerName,
       date: date || new Date(),
@@ -46,12 +46,12 @@ export class SaleService implements ISaleService {
       const product = await this._productRepository.getProduct(item.productId.toString(), userId);
       await this._productRepository.updateProduct(item.productId.toString(), userId, {
         quantity: product.quantity - item.quantity,
-      } as any);
+      });
     }
 
     const populatedSale = await this._saleRepository.findOne({
       _id: sale._id,
-      userId: userId as any,
+      userId: userId,
     });
     return toSaleDTO(populatedSale!);
   }
@@ -135,12 +135,12 @@ export class SaleService implements ISaleService {
     return { data, totalCount, totalPages, currentPage: page };
   }
 
-  async deleteSale(userId: any, id: string): Promise<void> {
+  async deleteSale(userId:string, id: string): Promise<void> {
     const currentUserId = userId.toString();
 
     const sale = await this._saleRepository.findOne({
       _id: id,
-      userId: userId as any,
+      userId: userId,
     });
 
     if (!sale) {
@@ -152,7 +152,7 @@ export class SaleService implements ISaleService {
       const product = await this._productRepository.getProduct(item.productId.toString(), currentUserId);
       await this._productRepository.updateProduct(item.productId.toString(), currentUserId, {
         quantity: (product.quantity || 0) + (item.quantity || 0),
-      } as any);
+      });
     }
 
     await this._saleRepository.deleteSale(id);

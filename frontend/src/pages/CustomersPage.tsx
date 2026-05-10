@@ -32,6 +32,7 @@ const CustomersPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<CustomerTypes | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
@@ -49,11 +50,14 @@ const CustomersPage = () => {
 
   const fetchCustomers = async () => {
     try {
+      setLoading(true);
       const data = await getAllCustomersAPI(searchQuery, currentPage, ITEMS_PER_PAGE);
       setCustomers(data.customers || []);
       setTotalPages(data.totalPages || 1);
     } catch (error) {
       showErrorToast(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -166,6 +170,7 @@ const CustomersPage = () => {
             }}
             onDelete={handleDelete}
             emptyMessage="No customers found."
+            isLoading={loading}
           />
 
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

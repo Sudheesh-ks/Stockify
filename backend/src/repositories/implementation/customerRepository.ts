@@ -53,7 +53,7 @@ export class CustomerRepository extends BaseRepository<CustomerDocument> impleme
     }
 
     const totalCount = await this.countDocuments(query);
-    let customersQuery = this.model.find(query);
+    let customersQuery = this.model.find(query).sort({ createdAt: -1 });
 
     if (page && limit) {
       customersQuery = customersQuery.skip((page - 1) * limit).limit(limit);

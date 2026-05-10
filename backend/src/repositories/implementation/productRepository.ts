@@ -55,7 +55,7 @@ export class ProductRepository extends BaseRepository<ProductsDocument> implemen
 
     const totalCount = await this.countDocuments(query);
 
-    let productsQuery = this.model.find(query);
+    let productsQuery = this.model.find(query).sort({ createdAt: -1 });
 
     if (page && limit) {
       productsQuery = productsQuery.skip((page - 1) * limit).limit(limit);

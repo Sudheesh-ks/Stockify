@@ -3,7 +3,7 @@ import { CustomerDocument } from '../models/customerModel';
 
 export const toCustomerDTO = (customer: CustomerDocument): CustomerDTO => {
   return {
-    _id: (customer._id as any).toString(),
+    _id: customer._id.toString(),
     name: customer.name,
     address: customer.address,
     mobile: customer.mobile,
