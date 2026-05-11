@@ -9,7 +9,7 @@ import StatCard from "../components/StatCard";
 import DashboardTable from "../components/DashboardTable";
 import type { ProductTypes } from "../types/product";
 import type { CustomerTypes } from "../types/customer";
-import type { SaleFormValues, SaleTypes } from "../types/sale";
+import type { SaleTypes } from "../types/sale";
 
 
 
@@ -49,7 +49,7 @@ const Dashboard = () => {
         data.recent.sales.map((s: SaleTypes) => {
           const firstItem = s.items?.[0];
           const productName = typeof firstItem?.productId === "object" ? firstItem.productId?.name : "—";
-          const totalQty = s.items?.reduce((acc: number, i: any) => acc + i.quantity, 0) ?? 0;
+          const totalQty = s.items?.reduce((acc: number, i: { quantity: number }) => acc + i.quantity, 0) ?? 0;
           return [productName, s.customerName || "Cash", totalQty, `₹${s.totalAmount}`];
         })
       );

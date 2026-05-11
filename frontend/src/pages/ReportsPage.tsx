@@ -10,7 +10,7 @@ import DashboardLayout from '../layout/DashboardLayout';
 import DataTable from '../components/DataTable';
 import type { Column } from '../components/DataTable';
 import { getAllSalesAPI, getItemsReportAPI, getCustomerLedgerAPI } from '../services/saleServices';
-import type { SaleTypes } from '../types/sale';
+import type { SaleItem, SaleTypes } from '../types/sale';
 import { showErrorToast } from '../utils/errorHandler';
 import { useEffect, useState } from 'react';
 import Pagination from '../components/Pagination';
@@ -62,31 +62,30 @@ const ReportsPage = () => {
   // Export Functions
   const exportToExcel = async () => {
     try {
-      let fullData: any[] = [];
-      let excelData: any[] = [];
+      let excelData: Array<Record<string, string | number>> = [];
 
       if (activeTab === 'sales') {
         const res = await getAllSalesAPI({ limit: 5000 });
-        fullData = res.sales;
-        excelData = fullData.map((s) => ({
+        const salesData = (res.sales || []) as SaleTypes[];
+        excelData = salesData.map((s) => ({
           Date: new Date(s.date).toLocaleDateString(),
-          Products: s.items.map((i: any) => i.productName).join(', '),
-          'Total Quantity': s.items.reduce((sum: number, i: any) => sum + i.quantity, 0),
+          Products: s.items.map((i: SaleItem) => i.productName ?? 'Unknown').join(', '),
+          'Total Quantity': s.items.reduce((sum: number, i: SaleItem) => sum + i.quantity, 0),
           'Total Amount': `₹${s.totalAmount.toFixed(2)}`,
           Customer: s.customerName,
         }));
       } else if (activeTab === 'items') {
         const res = await getItemsReportAPI(1, 5000);
-        fullData = res.data;
-        excelData = fullData.map((i) => ({
+        const itemsData = (res.data || []) as ItemReport[];
+        excelData = itemsData.map((i) => ({
           'Product Name': i.name,
           'Current Stock': i.stock,
           'Total Sold': i.sold,
         }));
       } else {
         const res = await getCustomerLedgerAPI(1, 5000);
-        fullData = res.data;
-        excelData = fullData.map((l) => ({
+        const ledgerData = (res.data || []) as LedgerReport[];
+        excelData = ledgerData.map((l) => ({
           'Customer Name': l.name,
           Transactions: l.transactions,
           'Total Spent': `₹${l.totalSpent.toFixed(2)}`,
@@ -108,30 +107,29 @@ const ReportsPage = () => {
       doc.text(`Stockify - ${activeTab.toUpperCase()} REPORT`, 14, 15);
 
       let headers: string[] = [];
-      let body: any[] = [];
-      let fullData: any[] = [];
+      let body: (string | number)[][] = [];
 
       if (activeTab === 'sales') {
         const res = await getAllSalesAPI({ limit: 5000 });
-        fullData = res.sales;
+        const salesData = (res.sales || []) as SaleTypes[];
         headers = ['Date', 'Products', 'Total Qty', 'Total', 'Customer'];
-        body = fullData.map((s) => [
+        body = salesData.map((s) => [
           new Date(s.date).toLocaleDateString(),
-          s.items.map((i: any) => i.productName).join(', '),
-          s.items.reduce((sum: number, i: any) => sum + i.quantity, 0),
+          s.items.map((i: SaleItem) => i.productName ?? 'Unknown').join(', '),
+          s.items.reduce((sum: number, i: SaleItem) => sum + i.quantity, 0),
           `Rs.${s.totalAmount.toFixed(2)}`,
           s.customerName,
         ]);
       } else if (activeTab === 'items') {
         const res = await getItemsReportAPI(1, 5000);
-        fullData = res.data;
+        const itemsData = (res.data || []) as ItemReport[];
         headers = ['Product Name', 'Current Stock', 'Total Sold'];
-        body = fullData.map((i) => [i.name, i.stock, i.sold]);
+        body = itemsData.map((i) => [i.name, i.stock, i.sold]);
       } else {
         const res = await getCustomerLedgerAPI(1, 5000);
-        fullData = res.data;
+        const ledgerData = (res.data || []) as LedgerReport[];
         headers = ['Customer Name', 'Transactions', 'Total Spent'];
-        body = fullData.map((l) => [l.name, l.transactions, `Rs.${l.totalSpent.toFixed(2)}`]);
+        body = ledgerData.map((l) => [l.name, l.transactions, `Rs.${l.totalSpent.toFixed(2)}`]);
       }
 
       autoTable(doc, {
@@ -146,12 +144,12 @@ const ReportsPage = () => {
   };
 
   // Columns
-  const salesColumns: Column<any>[] = [
+  const salesColumns: Column<SaleTypes>[] = [
     { header: 'Date', accessor: (s: SaleTypes) => new Date(s.date).toLocaleDateString() },
     {
       header: 'Products',
       accessor: (s: SaleTypes) => {
-        const names = s.items.map((i) => i.productName);
+        const names = s.items.map((i) => i.productName ?? 'Unknown');
         if (names.length <= 1) return names[0] || 'Unknown';
         return `${names[0]} (+${names.length - 1} more)`;
       },
@@ -240,9 +238,9 @@ const ReportsPage = () => {
           </div>
 
           <DataTable
-            data={(activeTab === 'sales' ? sales : activeTab === 'items' ? itemsReport : ledgerReport) as any[]}
+            data={(activeTab === 'sales' ? sales : activeTab === 'items' ? itemsReport : ledgerReport) as []}
             columns={
-              (activeTab === 'sales' ? salesColumns : activeTab === 'items' ? itemColumns : ledgerColumns) as any[]
+              (activeTab === 'sales' ? salesColumns : activeTab === 'items' ? itemColumns : ledgerColumns) as []
             }
             isLoading={isLoading}
             emptyMessage="No data available for this report."

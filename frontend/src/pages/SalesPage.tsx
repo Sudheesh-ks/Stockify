@@ -66,7 +66,7 @@ const SalesPage = () => {
     try {
       const { getAllCustomersAPI } = await import('../services/customerServices');
       const data = await getAllCustomersAPI(query, 1, 10);
-      return data.customers.map((c: any) => ({
+      return data.customers.map((c: { name: string; email: string }) => ({
         value: c.name,
         label: c.name,
         subLabel: c.email,
@@ -101,7 +101,7 @@ const SalesPage = () => {
     return () => clearTimeout(debounceTimer);
   }, [searchQuery, currentPage]);
 
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: SaleFormValues) => {
     try {
       await createSaleAPI(values);
       toast.success('Sale recorded successfully!');
