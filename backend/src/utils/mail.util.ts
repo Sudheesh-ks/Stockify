@@ -1,77 +1,53 @@
-import nodemailer from "nodemailer";
+import * as SibApiV3Sdk from "sib-api-v3-sdk";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config()
 
-const { SENDER_EMAIL, BREVO_API_KEY } = process.env;
 
-console.log("MAIL_EMAIL:", SENDER_EMAIL ? "Set" : "Not set");
-console.log("MAIL_PASSWORD:", BREVO_API_KEY ? "Set" : "Not set");
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY; 
 
-if (!SENDER_EMAIL || !BREVO_API_KEY) {
-  console.error(
-    "Email configuration missing! MAIL_EMAIL or MAIL_PASSWORD is not set.",
-  );
-}
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: { user: SENDER_EMAIL || "", pass: BREVO_API_KEY || "" },
-});
+export const sendOTP = async (email: string, otp: string): Promise<void> => {
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
-export const sendEmail = async (to: string, subject: string, html: string) => {
-  if (!SENDER_EMAIL || !BREVO_API_KEY) {
-    throw new Error("Email configuration is missing");
-  }
+  sendSmtpEmail.subject = `Verify your Account`;
+  sendSmtpEmail.sender = { "name": "Stockify", "email": process.env.SENDER_EMAIL };
+  sendSmtpEmail.to = [{ "email": email }];
 
-  try {
-    const result = await transporter.sendMail({
-      from: SENDER_EMAIL,
-      to,
-      subject,
-      html,
-    });
-    console.log("Email sent successfully:", result.messageId);
-    return result;
-  } catch (error) {
-    console.error("Email send failed:", error);
-    throw error;
-  }
-};
-
-// OTP
-export const sendOTP = async (email: string, otp: string) =>
-  sendEmail(
-    email,
-    "Verify Your Account - OTP Inside",
+  sendSmtpEmail.htmlContent =
     `
-    <div style="font-family:Arial,sans-serif;background:#f4f4f4;padding:40px 0">
-      <div style="max-width:600px;margin:auto;background:#fff;padding:30px;
-                  border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.1)">
-        <h2 style="text-align:center;color:#333">Welcome to Stockify 🙏</h2>
-        <p style="font-size:16px;color:#555">Hi there,</p>
-        <p style="font-size:16px;color:#555">
-          Use the One‑Time Password below to verify your account:
+    <div style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+      <div style="max-width: 500px; margin: auto; background: #ffffff; border-radius: 8px; padding: 24px; border: 1px solid #eee;">
+        <h2 style="text-align: center; color: #333;">Verify Your Email</h2>
+        <p style="color: #555; font-size: 15px;">
+          Hello,
         </p>
-        <div style="text-align:center;margin:30px 0">
-          <span style="display:inline-block;font-size:28px;font-weight:bold;
-                       color:#4CAF50;background:#f1f1f1;padding:15px 30px;
-                       border-radius:8px;letter-spacing:4px">
+        <p style="color: #555; font-size: 15px;">
+          Thank you for signing up with <strong>Stockify</strong>. Please use the OTP below to verify your account.
+        </p>
+        <div style="text-align: center; margin: 25px 0;">
+          <div style="display: inline-block; font-size: 24px; font-weight: bold; color: #222; background: #f1f1f1; padding: 12px 24px; border-radius: 6px;">
             ${otp}
-          </span>
+          </div>
         </div>
-        <p style="font-size:14px;color:#777">
-          This OTP is valid for ⏰ 1 minute. Do not share it with anyone.
+        <p style="color: #777; font-size: 14px; text-align: center;">
+          This OTP is valid for 1 minute. Please do not share it with anyone.
         </p>
-        <p style="font-size:14px;color:#777">
-          If you didn't request this, simply ignore this email.
-        </p>
-        <p style="margin-top:30px;font-size:14px;color:#999;text-align:center">
-          &copy; ${new Date().getFullYear()} Stockify. All rights reserved.
+        <p style="color: #aaa; font-size: 13px; text-align: center; margin-top: 20px;">
+          © ${new Date().getFullYear()} Stockify. All rights reserved.
         </p>
       </div>
     </div>
-    `,
-  );
+    `;
+
+  try {
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log('OTP sent successfully using Brevo API.');
+  } catch (error: any) {
+    console.error('Error sending OTP via Brevo API:', error.response?.body || error);
+    throw new Error('Failed to send OTP email.');
+  }
+};
